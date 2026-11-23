@@ -1,0 +1,269 @@
+﻿BlockPath,BlockType,Parameter,Expression,Resolved
+classic_dtc_winder_clean/Constant1,Constant,Value,Vdc,300
+classic_dtc_winder_clean/Constant11,Constant,Value,HB_lambda,0.00175
+classic_dtc_winder_clean/Constant12,Constant,Value,HB_torque,0.02
+classic_dtc_winder_clean/Constant13,Constant,Value,lambda_ref,0.175
+classic_dtc_winder_clean/Constant7,Constant,Value,Rs*Rs_factor,2.875
+classic_dtc_winder_clean/Constant8,Constant,Value,p,4
+classic_dtc_winder_clean/Constant9,Constant,Value,Ts_dtc,2e-05
+classic_dtc_winder_clean/Controller/Data Type Conversion,DataTypeConversion,OutDataTypeStr,double,
+classic_dtc_winder_clean/Controller/Logical Operator,Logic,Operator,NOT,
+classic_dtc_winder_clean/Controller/Logical Operator,Logic,Inputs,2,2
+classic_dtc_winder_clean/Controller/Logical Operator1,Logic,Operator,NOT,
+classic_dtc_winder_clean/Controller/Logical Operator1,Logic,Inputs,2,2
+classic_dtc_winder_clean/Controller/Logical Operator2,Logic,Operator,NOT,
+classic_dtc_winder_clean/Controller/Logical Operator2,Logic,Inputs,2,2
+classic_dtc_winder_clean/Controller/PID Controller,SubSystem,Controller,PI,
+classic_dtc_winder_clean/Controller/PID Controller,SubSystem,Form,Parallel,
+classic_dtc_winder_clean/Controller/PID Controller,SubSystem,TimeDomain,Discrete-time,
+classic_dtc_winder_clean/Controller/PID Controller,SubSystem,SampleTime,Ts_dtc,2e-05
+classic_dtc_winder_clean/Controller/PID Controller,SubSystem,IntegratorMethod,Forward Euler,
+classic_dtc_winder_clean/Controller/PID Controller,SubSystem,P,Kp_speed,2
+classic_dtc_winder_clean/Controller/PID Controller,SubSystem,I,Ki_speed,150
+classic_dtc_winder_clean/Controller/PID Controller,SubSystem,D,0,0
+classic_dtc_winder_clean/Controller/PID Controller,SubSystem,N,100,100
+classic_dtc_winder_clean/Controller/PID Controller,SubSystem,LimitOutput,on,
+classic_dtc_winder_clean/Controller/PID Controller,SubSystem,UpperSaturationLimit,5,5
+classic_dtc_winder_clean/Controller/PID Controller,SubSystem,LowerSaturationLimit,-5,-5
+classic_dtc_winder_clean/Controller/PID Controller,SubSystem,AntiWindupMode,clamping,
+classic_dtc_winder_clean/Controller/PID Controller,SubSystem,Kb,1,1
+classic_dtc_winder_clean/Controller/Sum,Sum,Inputs,|+-,
+classic_dtc_winder_clean/Controller/Unit Delay1,UnitDelay,InitialCondition,0,0
+classic_dtc_winder_clean/Controller/Unit Delay1,UnitDelay,SampleTime,Ts_dtc ,2e-05
+classic_dtc_winder_clean/Controller/Unit Delay2,UnitDelay,InitialCondition,0,0
+classic_dtc_winder_clean/Controller/Unit Delay2,UnitDelay,SampleTime,Ts_dtc ,2e-05
+classic_dtc_winder_clean/Controller/Unit Delay3,UnitDelay,InitialCondition,0,0
+classic_dtc_winder_clean/Controller/Unit Delay3,UnitDelay,SampleTime,Ts_dtc ,2e-05
+classic_dtc_winder_clean/Controller/omega_ref,Step,Time,0.05,0.05
+classic_dtc_winder_clean/Controller/omega_ref,Step,InitialValue,0,0
+classic_dtc_winder_clean/Controller/omega_ref,Step,FinalValue,w_ref,20
+classic_dtc_winder_clean/Controller/omega_ref_ramp,RateLimiter,RisingSlewLimit,700,700
+classic_dtc_winder_clean/Controller/omega_ref_ramp,RateLimiter,FallingSlewLimit,-700,-700
+classic_dtc_winder_clean/Controller/omega_rev,Step,Time,t_rev,1000000000
+classic_dtc_winder_clean/Controller/omega_rev,Step,InitialValue,0,0
+classic_dtc_winder_clean/Controller/omega_rev,Step,FinalValue,-2*w_ref,-40
+classic_dtc_winder_clean/Controller/ref_sum,Sum,Inputs,++,
+classic_dtc_winder_clean/Data Type Conversion1,DataTypeConversion,OutDataTypeStr,double,
+classic_dtc_winder_clean/Data Type Conversion2,DataTypeConversion,OutDataTypeStr,double,
+classic_dtc_winder_clean/Feedforward/FF_Mux,Mux,Inputs,4,4
+classic_dtc_winder_clean/Feedforward/FF_Mux3a,Mux,Inputs,3,3
+classic_dtc_winder_clean/Feedforward/FF_Mux4b,Mux,Inputs,4,4
+classic_dtc_winder_clean/Feedforward/Jwdot,Product,Inputs,2,2
+classic_dtc_winder_clean/Feedforward/Jwdot,Product,Multiplication,Element-wise(.*),
+classic_dtc_winder_clean/Feedforward/T_inertia,Sum,Inputs,++,
+classic_dtc_winder_clean/Feedforward/Te_sat,Saturate,UpperLimit,Tmax,5
+classic_dtc_winder_clean/Feedforward/Te_sat,Saturate,LowerLimit,-Tmax,-5
+classic_dtc_winder_clean/Feedforward/Te_sum,Sum,Inputs,++,
+classic_dtc_winder_clean/Feedforward/Tff_extra,Fcn,Expr,u(1)*F_ref*u(3) + B*u(4),
+classic_dtc_winder_clean/Feedforward/Tff_sum,Sum,Inputs,++,
+classic_dtc_winder_clean/Feedforward/dJdr,Fcn,Expr,rho*w*pi*u(1)*(u(1)^2+rc^2) + (rho*w*pi*(u(1)^2-rc^2))*u(1),
+classic_dtc_winder_clean/Feedforward/dJw,Product,Inputs,3,3
+classic_dtc_winder_clean/Feedforward/dJw,Product,Multiplication,Element-wise(.*),
+classic_dtc_winder_clean/Feedforward/ff_full_c,Constant,Value,ff_full,0
+classic_dtc_winder_clean/Feedforward/ff_full_gate,Product,Inputs,2,2
+classic_dtc_winder_clean/Feedforward/ff_full_gate,Product,Multiplication,Element-wise(.*),
+classic_dtc_winder_clean/Feedforward/ff_gate,Product,Inputs,2,2
+classic_dtc_winder_clean/Feedforward/ff_gate,Product,Multiplication,Element-wise(.*),
+classic_dtc_winder_clean/Feedforward/ff_on,Constant,Value,ff_on,1
+classic_dtc_winder_clean/Feedforward/rdotFF,Fcn,Expr,u(1)*h*u(2)/(2*pi*u(3)),
+classic_dtc_winder_clean/Feedforward/v_scurve_d,Fcn,Expr,v_line_set*(6*u(1)-6*u(1)^2)/T_ramp,
+classic_dtc_winder_clean/Feedforward/v_tau_ff,Gain,Gain,1/T_ramp,2.5
+classic_dtc_winder_clean/Feedforward/v_tau_ff,Gain,Multiplication,Element-wise(K.*u),
+classic_dtc_winder_clean/Feedforward/v_tau_sat_ff,Saturate,UpperLimit,1,1
+classic_dtc_winder_clean/Feedforward/v_tau_sat_ff,Saturate,LowerLimit,0,0
+classic_dtc_winder_clean/Feedforward/wdotFF,Fcn,Expr,u(4)/u(1) - u(2)*u(3)/(u(1)^2),
+classic_dtc_winder_clean/Line_Reference/F_ref_set,Constant,Value,F_ref,15
+classic_dtc_winder_clean/Line_Reference/v_sat,Saturate,UpperLimit,v_line_set,1.2
+classic_dtc_winder_clean/Line_Reference/v_sat,Saturate,LowerLimit,0,0
+classic_dtc_winder_clean/Line_Reference/v_scurve,Fcn,Expr,v_line_set*(3*u(1)^2-2*u(1)^3),
+classic_dtc_winder_clean/Line_Reference/v_tau,Gain,Gain,1/T_ramp,2.5
+classic_dtc_winder_clean/Line_Reference/v_tau,Gain,Multiplication,Element-wise(K.*u),
+classic_dtc_winder_clean/Line_Reference/v_tau_sat,Saturate,UpperLimit,1,1
+classic_dtc_winder_clean/Line_Reference/v_tau_sat,Saturate,LowerLimit,0,0
+classic_dtc_winder_clean/Line_Reference/winder_mode,Constant,Value,winder_mode_set,1
+classic_dtc_winder_clean/Logging/F_log,ToWorkspace,VariableName,F_log,
+classic_dtc_winder_clean/Logging/F_log,ToWorkspace,SaveFormat,Timeseries,
+classic_dtc_winder_clean/Logging/J_log,ToWorkspace,VariableName,J_log,
+classic_dtc_winder_clean/Logging/J_log,ToWorkspace,SaveFormat,Timeseries,
+classic_dtc_winder_clean/Logging/Sa_data,ToWorkspace,VariableName,Sa_data,
+classic_dtc_winder_clean/Logging/Sa_data,ToWorkspace,SaveFormat,Timeseries,
+classic_dtc_winder_clean/Logging/TL_log,ToWorkspace,VariableName,TL_log,
+classic_dtc_winder_clean/Logging/TL_log,ToWorkspace,SaveFormat,Timeseries,
+classic_dtc_winder_clean/Logging/Te_data,ToWorkspace,VariableName,Ts_data,
+classic_dtc_winder_clean/Logging/Te_data,ToWorkspace,SaveFormat,Timeseries,
+classic_dtc_winder_clean/Logging/Te_log,ToWorkspace,VariableName,Te_log,
+classic_dtc_winder_clean/Logging/Te_log,ToWorkspace,SaveFormat,Timeseries,
+classic_dtc_winder_clean/Logging/ia_data,ToWorkspace,VariableName,ia_data,
+classic_dtc_winder_clean/Logging/ia_data,ToWorkspace,SaveFormat,Timeseries,
+classic_dtc_winder_clean/Logging/ib_data,ToWorkspace,VariableName,ib_data,
+classic_dtc_winder_clean/Logging/ib_data,ToWorkspace,SaveFormat,Timeseries,
+classic_dtc_winder_clean/Logging/lam_data,ToWorkspace,VariableName,lam_data,
+classic_dtc_winder_clean/Logging/lam_data,ToWorkspace,SaveFormat,Timeseries,
+classic_dtc_winder_clean/Logging/r_log,ToWorkspace,VariableName,r_log,
+classic_dtc_winder_clean/Logging/r_log,ToWorkspace,SaveFormat,Timeseries,
+classic_dtc_winder_clean/Logging/w_data,ToWorkspace,VariableName,w_data,
+classic_dtc_winder_clean/Logging/w_data,ToWorkspace,SaveFormat,Timeseries,
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,port_option,ee.enum.threePhasePort.composite,
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,Rs,0.1,0.1
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,fidelity_option,ee.enum.converters.fidelity.detailed,
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,device_type,ee.enum.converters.switchingdevice.ideal,
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,showThermalPort,false,
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,Ron,0.001,0.001
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,Vf,0.8,0.8
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,Vth,0.5,0.5
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,Ih,1,1
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,Goff,1e-6,1e-06
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,Eon_scalar,22.86e-3,0.02286
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,Eoff_scalar,17.14e-3,0.01714
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,Voff,300,300
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,Iout_scalar,600,600
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,diode_param,ee.enum.converters.protectiondiode.nodynamics,
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,diode_Vf,0.8,0.8
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,diode_Ron,0.001,0.001
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,diode_Goff,1e-5,1e-05
+classic_dtc_winder_clean/Plant/Converter (Three-Phase),SimscapeBlock,snubber_type,ee.enum.converters.snubber.exclude,
+classic_dtc_winder_clean/Plant/DC Voltage Source,SimscapeBlock,v0,Vdc,300
+classic_dtc_winder_clean/Plant/PMSM1,SimscapeBlock,port_option,ee.enum.threePhasePort.composite,
+classic_dtc_winder_clean/Plant/PMSM1,SimscapeBlock,winding_type,ee.enum.electromech.statorconfiguration.wye,
+classic_dtc_winder_clean/Plant/PMSM1,SimscapeBlock,machine_param,ee.enum.pmsm.parameterization.constant,
+classic_dtc_winder_clean/Plant/PMSM1,SimscapeBlock,nPolePairs,p,4
+classic_dtc_winder_clean/Plant/PMSM1,SimscapeBlock,pmflux_param,ee.enum.pmflux.fluxlinkage,
+classic_dtc_winder_clean/Plant/PMSM1,SimscapeBlock,pm_flux_linkage,lambda_f,0.175
+classic_dtc_winder_clean/Plant/PMSM1,SimscapeBlock,stator_param,ee.enum.statorparam.LdLqL0,
+classic_dtc_winder_clean/Plant/PMSM1,SimscapeBlock,Ld,Ld,0.0085
+classic_dtc_winder_clean/Plant/PMSM1,SimscapeBlock,Lq,Lq,0.0085
+classic_dtc_winder_clean/Plant/PMSM1,SimscapeBlock,L0,0.00016,0.00016
+classic_dtc_winder_clean/Plant/PMSM1,SimscapeBlock,Rs,Rs,2.875
+classic_dtc_winder_clean/Plant/PMSM1,SimscapeBlock,zero_sequence,ee.enum.park.zerosequence.include,
+classic_dtc_winder_clean/Plant/PMSM1,SimscapeBlock,axes_param,ee.enum.rotorangle.daxis,
+classic_dtc_winder_clean/Plant/PMSM1,SimscapeBlock,loss_param,ee.enum.ironloss.none,
+classic_dtc_winder_clean/Plant/PMSM1,SimscapeBlock,J,0,0
+classic_dtc_winder_clean/Plant/PMSM1,SimscapeBlock,lam,0,0
+classic_dtc_winder_clean/Plant/PS-Simulink Converter4,SubSystem,MaskType,PS-Simulink Converter,
+classic_dtc_winder_clean/Plant/PS-Simulink Converter4,SubSystem,MaskValues,network_engine_domain | ps_output | input | output | off | [] | inherit | inherit | off,
+classic_dtc_winder_clean/Plant/PS-Simulink Converter5,SubSystem,MaskType,PS-Simulink Converter,
+classic_dtc_winder_clean/Plant/PS-Simulink Converter5,SubSystem,MaskValues,network_engine_domain | ps_output | input | output | off | [] | inherit | inherit | off,
+classic_dtc_winder_clean/Plant/PS-Simulink Converter6,SubSystem,MaskType,PS-Simulink Converter,
+classic_dtc_winder_clean/Plant/PS-Simulink Converter6,SubSystem,MaskValues,network_engine_domain | ps_output | input | output | off | [] | inherit | inherit | off,
+classic_dtc_winder_clean/Plant/PS-Simulink Converter7,SubSystem,MaskType,PS-Simulink Converter,
+classic_dtc_winder_clean/Plant/PS-Simulink Converter7,SubSystem,MaskValues,network_engine_domain | ps_output | input | output | off | [] | inherit | inherit | off,
+classic_dtc_winder_clean/Plant/Simulink-PS Converter,SubSystem,MaskType,Simulink-PS Converter,
+classic_dtc_winder_clean/Plant/Simulink-PS Converter,SubSystem,MaskValues,network_engine_domain | ps_input | input | output | off | [] | none | [] | 1 | off | provide | 1 | 0.001 | 0,
+classic_dtc_winder_clean/Plant/Simulink-PS Converter2,SubSystem,MaskType,Simulink-PS Converter,
+classic_dtc_winder_clean/Plant/Simulink-PS Converter2,SubSystem,MaskValues,network_engine_domain | ps_input | input | output | off | [] | none | [] | 1 | off | provide | 1 | 0.001 | 0,
+classic_dtc_winder_clean/Plant/Simulink-PS Converter3,SubSystem,MaskType,Simulink-PS Converter,
+classic_dtc_winder_clean/Plant/Simulink-PS Converter3,SubSystem,MaskValues,network_engine_domain | ps_input | input | output | off | [] | none | [] | 1 | off | provide | 1 | 0.001 | 0,
+classic_dtc_winder_clean/Plant/Simulink-PS Converter4,SubSystem,MaskType,Simulink-PS Converter,
+classic_dtc_winder_clean/Plant/Simulink-PS Converter4,SubSystem,MaskValues,network_engine_domain | ps_input | input | output | off | [] | none | [] | 1 | off | provide | 1 | 0.001 | 0,
+classic_dtc_winder_clean/Plant/Simulink-PS Converter5,SubSystem,MaskType,Simulink-PS Converter,
+classic_dtc_winder_clean/Plant/Simulink-PS Converter5,SubSystem,MaskValues,network_engine_domain | ps_input | input | output | off | [] | none | [] | 1 | off | provide | 1 | 0.001 | 0,
+classic_dtc_winder_clean/Plant/Simulink-PS Converter6,SubSystem,MaskType,Simulink-PS Converter,
+classic_dtc_winder_clean/Plant/Simulink-PS Converter6,SubSystem,MaskValues,network_engine_domain | ps_input | input | output | off | [] | none | [] | 1 | off | provide | 1 | 0.001 | 0,
+classic_dtc_winder_clean/Plant/Six-Pulse Gate Multiplexer,SimscapeBlock,port_option,ee.enum.controlport.ps,
+classic_dtc_winder_clean/Plant/Solver Configuration,SubSystem,MaskType,Solver Configuration,
+classic_dtc_winder_clean/Plant/Solver Configuration,SubSystem,MaskValues,network_engine_domain | solver | input | generic | [] | [] | off | [] | [] | on | off | off | off | off | off | off | off | off | on | off | off | 0.001 | 0.001 | 1e-09 | off | off | 100 | off | 1 | NEWTON_XTOL_AFTER_FTOL | CANONICAL | OPTIMIZED | DerivativeReplacement | off | 1e-09 | GLOBAL | 0.001 | 0.001 | 0.001 | off | NE_BACKWARD_EULER_ADVANCER | on | 1 | 0.001 | off | 3 | 2 | off | 2 | auto | 0 | NE_TIME_EF | 1024 | on | 0.001 | AS_NEEDED | 1024 | ROBUST | off | ODE1 | 0.001,
+classic_dtc_winder_clean/Plant/Te Conv,SubSystem,MaskType,PS-Simulink Converter,
+classic_dtc_winder_clean/Plant/Te Conv,SubSystem,MaskValues,network_engine_domain | ps_output | input | output | off | [] | inherit | inherit | off,
+classic_dtc_winder_clean/Plant/Winder Plant/Bw,Gain,Gain,B,0.0001
+classic_dtc_winder_clean/Plant/Winder Plant/Bw,Gain,Multiplication,Element-wise(K.*u),
+classic_dtc_winder_clean/Plant/Winder Plant/C_d,Gain,Gain,C_web,500
+classic_dtc_winder_clean/Plant/Winder Plant/C_d,Gain,Multiplication,Element-wise(K.*u),
+classic_dtc_winder_clean/Plant/Winder Plant/F_sat,Saturate,UpperLimit,Fmax,200
+classic_dtc_winder_clean/Plant/Winder Plant/F_sat,Saturate,LowerLimit,0,0
+classic_dtc_winder_clean/Plant/Winder Plant/F_sum,Sum,Inputs,++,
+classic_dtc_winder_clean/Plant/Winder Plant/Int_H,Integrator,InitialCondition,H0,
+classic_dtc_winder_clean/Plant/Winder Plant/Int_H,Integrator,LimitOutput,off,
+classic_dtc_winder_clean/Plant/Winder Plant/Int_H,Integrator,UpperSaturationLimit,inf,Inf
+classic_dtc_winder_clean/Plant/Winder Plant/Int_H,Integrator,LowerSaturationLimit,-inf,-Inf
+classic_dtc_winder_clean/Plant/Winder Plant/Int_H,Integrator,ExternalReset,none,
+classic_dtc_winder_clean/Plant/Winder Plant/Int_r,Integrator,InitialCondition,r0,
+classic_dtc_winder_clean/Plant/Winder Plant/Int_r,Integrator,LimitOutput,on,
+classic_dtc_winder_clean/Plant/Winder Plant/Int_r,Integrator,UpperSaturationLimit,rmax,0.12
+classic_dtc_winder_clean/Plant/Winder Plant/Int_r,Integrator,LowerSaturationLimit,rc,0.05
+classic_dtc_winder_clean/Plant/Winder Plant/Int_r,Integrator,ExternalReset,none,
+classic_dtc_winder_clean/Plant/Winder Plant/Int_x,Integrator,InitialCondition,F0/K_web,5e-05
+classic_dtc_winder_clean/Plant/Winder Plant/Int_x,Integrator,LimitOutput,on,
+classic_dtc_winder_clean/Plant/Winder Plant/Int_x,Integrator,UpperSaturationLimit,Fmax/K_web,0.0006666666667
+classic_dtc_winder_clean/Plant/Winder Plant/Int_x,Integrator,LowerSaturationLimit,0,0
+classic_dtc_winder_clean/Plant/Winder Plant/Int_x,Integrator,ExternalReset,none,
+classic_dtc_winder_clean/Plant/Winder Plant/J,Sum,Inputs,++,
+classic_dtc_winder_clean/Plant/Winder Plant/Jc,Constant,Value,Jc,0.005
+classic_dtc_winder_clean/Plant/Winder Plant/Jm,Constant,Value,Jm,0.0008
+classic_dtc_winder_clean/Plant/Winder Plant/Jroll,Sum,Inputs,++,
+classic_dtc_winder_clean/Plant/Winder Plant/Jroll_core,Product,Inputs,2,2
+classic_dtc_winder_clean/Plant/Winder Plant/Jroll_core,Product,Multiplication,Element-wise(.*),
+classic_dtc_winder_clean/Plant/Winder Plant/K_x,Gain,Gain,K_web,300000
+classic_dtc_winder_clean/Plant/Winder Plant/K_x,Gain,Multiplication,Element-wise(K.*u),
+classic_dtc_winder_clean/Plant/Winder Plant/TL,Product,Inputs,3,3
+classic_dtc_winder_clean/Plant/Winder Plant/TL,Product,Multiplication,Element-wise(.*),
+classic_dtc_winder_clean/Plant/Winder Plant/dHdt,Sum,Inputs,+--,
+classic_dtc_winder_clean/Plant/Winder Plant/den_dr,Gain,Gain,2*pi,6.283185307
+classic_dtc_winder_clean/Plant/Winder Plant/den_dr,Gain,Multiplication,Element-wise(K.*u),
+classic_dtc_winder_clean/Plant/Winder Plant/drdt,Product,Inputs,*/,
+classic_dtc_winder_clean/Plant/Winder Plant/drdt,Product,Multiplication,Element-wise(.*),
+classic_dtc_winder_clean/Plant/Winder Plant/dv,Sum,Inputs,+-,
+classic_dtc_winder_clean/Plant/Winder Plant/dxdt,Product,Inputs,2,2
+classic_dtc_winder_clean/Plant/Winder Plant/dxdt,Product,Multiplication,Element-wise(.*),
+classic_dtc_winder_clean/Plant/Winder Plant/h_gain,Gain,Gain,h,0.0005
+classic_dtc_winder_clean/Plant/Winder Plant/h_gain,Gain,Multiplication,Element-wise(K.*u),
+classic_dtc_winder_clean/Plant/Winder Plant/half_m,Gain,Gain,0.5,0.5
+classic_dtc_winder_clean/Plant/Winder Plant/half_m,Gain,Multiplication,Element-wise(K.*u),
+classic_dtc_winder_clean/Plant/Winder Plant/m,Gain,Gain,rho*web_w*pi,753.9822369
+classic_dtc_winder_clean/Plant/Winder Plant/m,Gain,Multiplication,Element-wise(K.*u),
+classic_dtc_winder_clean/Plant/Winder Plant/num_dr,Product,Inputs,2,2
+classic_dtc_winder_clean/Plant/Winder Plant/num_dr,Product,Multiplication,Element-wise(.*),
+classic_dtc_winder_clean/Plant/Winder Plant/omega,Product,Inputs,*/,
+classic_dtc_winder_clean/Plant/Winder Plant/omega,Product,Multiplication,Element-wise(.*),
+classic_dtc_winder_clean/Plant/Winder Plant/r2,Product,Inputs,2,2
+classic_dtc_winder_clean/Plant/Winder Plant/r2,Product,Multiplication,Element-wise(.*),
+classic_dtc_winder_clean/Plant/Winder Plant/r2_minus_rc2,Sum,Inputs,+-,
+classic_dtc_winder_clean/Plant/Winder Plant/r2_plus_rc2,Sum,Inputs,++,
+classic_dtc_winder_clean/Plant/Winder Plant/rc2,Constant,Value,rc^2,0.0025
+classic_dtc_winder_clean/Plant/Winder Plant/vsurf,Product,Inputs,2,2
+classic_dtc_winder_clean/Plant/Winder Plant/vsurf,Product,Multiplication,Element-wise(.*),
+classic_dtc_winder_clean/Plant/w Conv,SubSystem,MaskType,Simulink-PS Converter,
+classic_dtc_winder_clean/Plant/w Conv,SubSystem,MaskValues,network_engine_domain | ps_input | input | output | off | [] | none | [] | 1 | off | provide | 1 | 0.001 | 0,
+classic_dtc_winder_clean/Tension Control/PI_F,SubSystem,Controller,PI,
+classic_dtc_winder_clean/Tension Control/PI_F,SubSystem,Form,Parallel,
+classic_dtc_winder_clean/Tension Control/PI_F,SubSystem,TimeDomain,Continuous-time,
+classic_dtc_winder_clean/Tension Control/PI_F,SubSystem,SampleTime,-1,-1
+classic_dtc_winder_clean/Tension Control/PI_F,SubSystem,IntegratorMethod,Forward Euler,
+classic_dtc_winder_clean/Tension Control/PI_F,SubSystem,P,Kp_F,0.00044
+classic_dtc_winder_clean/Tension Control/PI_F,SubSystem,I,Ki_F,0.00089
+classic_dtc_winder_clean/Tension Control/PI_F,SubSystem,D,0,0
+classic_dtc_winder_clean/Tension Control/PI_F,SubSystem,N,100,100
+classic_dtc_winder_clean/Tension Control/PI_F,SubSystem,LimitOutput,on,
+classic_dtc_winder_clean/Tension Control/PI_F,SubSystem,UpperSaturationLimit,draw_max,0.2
+classic_dtc_winder_clean/Tension Control/PI_F,SubSystem,LowerSaturationLimit,-draw_max,-0.2
+classic_dtc_winder_clean/Tension Control/PI_F,SubSystem,AntiWindupMode,clamping,
+classic_dtc_winder_clean/Tension Control/PI_F,SubSystem,Kb,1,1
+classic_dtc_winder_clean/Tension Control/draw_total,Sum,Inputs,++,
+classic_dtc_winder_clean/Tension Control/eF,Sum,Inputs,+-,
+classic_dtc_winder_clean/Tension Control/inv_Fslack,Gain,Gain,1/F_slack,2
+classic_dtc_winder_clean/Tension Control/inv_Fslack,Gain,Multiplication,Element-wise(K.*u),
+classic_dtc_winder_clean/Tension Control/mode_draw,Product,Inputs,2,2
+classic_dtc_winder_clean/Tension Control/mode_draw,Product,Multiplication,Element-wise(.*),
+classic_dtc_winder_clean/Tension Control/one,Constant,Value,1,1
+classic_dtc_winder_clean/Tension Control/one_minus,Sum,Inputs,+-,
+classic_dtc_winder_clean/Tension Control/slack_sat,Saturate,UpperLimit,1,1
+classic_dtc_winder_clean/Tension Control/slack_sat,Saturate,LowerLimit,0,0
+classic_dtc_winder_clean/Tension Control/takeup_gain,Gain,Gain,draw_takeup,0.02
+classic_dtc_winder_clean/Tension Control/takeup_gain,Gain,Multiplication,Element-wise(K.*u),
+classic_dtc_winder_clean/Tension Control/w_ff,Product,Inputs,*/,
+classic_dtc_winder_clean/Tension Control/w_ff,Product,Multiplication,Element-wise(.*),
+classic_dtc_winder_clean/Tension Control/w_lim,Saturate,UpperLimit,w_max,60
+classic_dtc_winder_clean/Tension Control/w_lim,Saturate,LowerLimit,w_min,0
+classic_dtc_winder_clean/Tension Control/w_ref,Sum,Inputs,++,
+classic_dtc_winder_clean/filt_on,Constant,Value,filt_on,1
+classic_dtc_winder_clean/filt_sel,Switch,Criteria,u2 > Threshold,
+classic_dtc_winder_clean/filt_sel,Switch,Threshold,0.5,0.5
+classic_dtc_winder_clean/lpf_gain,Gain,Gain,1/tau_F,12.56637061
+classic_dtc_winder_clean/lpf_gain,Gain,Multiplication,Element-wise(K.*u),
+classic_dtc_winder_clean/lpf_int,Integrator,InitialCondition,F0,15
+classic_dtc_winder_clean/lpf_int,Integrator,LimitOutput,off,
+classic_dtc_winder_clean/lpf_int,Integrator,UpperSaturationLimit,inf,Inf
+classic_dtc_winder_clean/lpf_int,Integrator,LowerSaturationLimit,-inf,-Inf
+classic_dtc_winder_clean/lpf_int,Integrator,ExternalReset,none,
+classic_dtc_winder_clean/lpf_sum,Sum,Inputs,+-,
+classic_dtc_winder_clean/Controller/dtc_estimator/ Demux ,Demux,Outputs,1,1
+classic_dtc_winder_clean/Controller/dtc_estimator/ SFunction ,S-Function,FunctionName,sf_sfun,

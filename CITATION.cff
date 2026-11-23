@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+title: "PMSM DTC/SVM-DTC Winder Simulation"
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - name: "PMSM DTC/SVM-DTC Winder Simulation contributors"
+version: "1.0.0"
+date-released: "2026-11-24"
+license: "MIT"
+abstract: >-
+  A MATLAB/Simulink study of classical hysteresis Direct Torque Control (DTC)
+  and Space-Vector-Modulated DTC (SVM-DTC) for a surface-mounted permanent
+  magnet synchronous motor (PMSM) driving a winder/unwinder. The repository
+  includes motor and drive models, a voltage-model flux/torque estimator,
+  stator-resistance robustness studies, a variable-radius and variable-inertia
+  winder plant, tension PI control, radius/inertia/tension feedforward, an
+  S-curve line reference, and an 18-case final comparison matrix.
+keywords:
+  - PMSM
+  - direct torque control
+  - DTC
+  - SVM-DTC
+  - winder
+  - unwinder
+  - tension control
+  - Simulink
+  - Simscape
+  - motor drives

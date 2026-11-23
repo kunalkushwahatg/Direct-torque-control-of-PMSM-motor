@@ -1,0 +1,482 @@
+%% Final research project report - winder/unwinder tension control
+%% Compile with XeLaTeX (real Times New Roman from ./fonts) - Overleaf: Menu > Compiler > XeLaTeX.
+%% If compiled with pdfLaTeX it falls back to a Times-compatible font automatically.
+\documentclass[12pt,a4paper,onecolumn]{IEEEtran}
+
+\usepackage{iftex}
+\ifXeTeX
+  \usepackage{fontspec}
+  \setmainfont{times.ttf}[Path=./fonts/, BoldFont=timesbd.ttf, ItalicFont=timesi.ttf, BoldItalicFont=timesbi.ttf]
+  \usepackage{amsmath}
+  \usepackage{unicode-math}
+  \setmathfont{texgyretermes-math.otf}[Path=./fonts/]
+\else
+  \usepackage[T1]{fontenc}
+  \usepackage{mathptmx}
+  \usepackage{amsmath,amssymb}
+\fi
+\usepackage[a4paper,top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm]{geometry}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{cite}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\setstretch{1.5}
+
+% ---------- length switches ----------
+\newif\ifextras \extrasfalse  % extra figures: unwinding comparison
+\newif\iftoc \tocfalse         % contents page
+
+\usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=blue]{hyperref}
+
+% ---------- helpers ----------
+\newcommand{\Nm}{\,\mathrm{N\cdot m}}
+\newcommand{\Wb}{\,\mathrm{Wb}}
+\newcommand{\rads}{\,\mathrm{rad/s}}
+\tikzset{
+  blk/.style={draw,rectangle,minimum height=9mm,minimum width=17mm,align=center,font=\small,inner sep=2pt},
+  sm/.style={draw,circle,inner sep=0pt,minimum size=5mm,font=\footnotesize},
+  arr/.style={-{Stealth[length=2mm]}},
+  lab/.style={font=\footnotesize,inner sep=1pt}
+}
+\newcommand{\figgraphic}[2]{\includegraphics[width=#1\linewidth]{#2}}
+
+\begin{document}
+
+%% =====================  COVER PAGE  =====================
+\thispagestyle{empty}
+\begin{center}
+\singlespacing
+\vspace*{0.3cm}
+\includegraphics[width=3.4cm]{figures/nitrkl.jpg}\\[0.8cm]
+{\Large \textbf{Project Report}}\\[1.0cm]
+{\Huge \textbf{Direct Torque Control of\\ PMSM Motor}}\\[1.4cm]
+{\large Submitted by}\\[0.3cm]
+{\Large \textbf{Kunal Kushwaha}}\\[0.2cm]
+{\large Roll No.\ 123EE0291}\\[1.2cm]
+{\large Under the guidance of}\\[0.3cm]
+{\Large \textbf{Prof.\ Krishna Roy}}\\[1.4cm]
+{\large Department of Electrical Engineering}\\[0.2cm]
+{\large National Institute of Technology Rourkela}\\[0.2cm]
+{\large Odisha, India -- 769008}\\[1.8cm]
+\hfill\begin{tabular}{c}
+\rule{6.5cm}{0.4pt}\\
+\small Signature of the supervisor
+\end{tabular}
+\end{center}
+\clearpage
+\setcounter{page}{1}
+
+%% =====================  ABSTRACT  =====================
+\begin{center}\textbf{\large Abstract}\end{center}
+\noindent Web tension in winding and unwinding systems is affected by the continuously varying roll radius and inertia and by the torque ripple of the drive. This report presents a physically consistent winder model and compares classical direct torque control (DTC) with space-vector-modulated DTC (SVM-DTC) under identical mechanics. The plant uses the momentum form of the variable-inertia equation, a Kelvin--Voigt web and a cubic S-curve line-speed reference. An outer tension loop trims the speed reference and is supported by radius and model-based torque feedforward. The plant model is presented, and both drives are tested in winding and unwinding over line-speed, initial-radius and tension-step variations. Feedforward reduces the tension RMSE by 88--98\% and avoids torque saturation. SVM-DTC reduces the torque ripple by roughly an order of magnitude and lowers the peak current, while classical DTC gives slightly tighter steady tension in winding; a residual oscillation remains in the SVM winding case. The results quantify the trade-off between electrical smoothness and tension regulation in winder drives.
+
+\vspace{0.2cm}
+\noindent\textit{Keywords:} winder, web tension, PMSM, direct torque control, SVM-DTC, feedforward, variable inertia.
+
+\iftoc\clearpage\tableofcontents\clearpage\fi
+
+%% =====================  I. INTRODUCTION  =====================
+\section{Introduction}
+Permanent-magnet synchronous motors (PMSMs) are widely used in industrial drives because of their efficiency and power density. Their torque is usually regulated either by field-oriented control, which controls the stator currents in the rotor frame, or by direct torque control (DTC) \cite{takahashi1986,depenbrock1988}. Conventional DTC estimates the stator flux and the electromagnetic torque, compares them with their references through hysteresis comparators, and selects an inverter voltage vector from a switching table. It has a fast torque response and does not need a current regulator, but its switching frequency is variable and its torque and flux ripple are relatively large \cite{buja2004}. DTC with space-vector modulation (SVM-DTC) replaces the hysteresis comparators and the table by two PI controllers and a fixed-frequency modulator, which reduces the ripple at the cost of a slightly slower response \cite{habetler1992,tang2004}.
+
+Web handling adds a second layer of difficulty. In a winder the roll radius changes as material is wound or unwound, and the roll inertia changes with the square of the radius. The drive is therefore a time-varying inertial load, and the tension is set by the small difference between the roll surface speed and the line speed. A tension loop that only reacts to the measured tension has to supply the whole acceleration torque, and it typically overshoots during a line-speed ramp. The problem is well known in web-processing lines, where models of the winding system and robust tension controllers have been studied for elastic webs \cite{koc2002,pagilla2007}. Most drive-level studies, however, use a constant-inertia load or an ideal torque source, so the interaction between the drive ripple and the tension loop is not visible.
+
+This report addresses that gap with a simulation study. Its contributions are: (i) a winder plant that keeps the variable-inertia term in the momentum equation and includes a viscoelastic web; (ii) an integrated tension architecture with radius feedforward and model-based torque feedforward, applied identically to both drives; (iii) a fair four-way comparison between classical DTC and SVM-DTC in winding and unwinding, repeated over line speed, initial radius and a tension step; and (iv) a quantified trade-off between electrical smoothness and tension regulation, including the residual oscillation that remains in the SVM winding case.
+
+The rest of the report is organised as follows. Section~\ref{sec:lit} reviews the background. Section~\ref{sec:plant} presents the plant model, Section~\ref{sec:control} the tension architecture and Section~\ref{sec:drives} the two drives. Section~\ref{sec:res} gives the results, and Sections~\ref{sec:disc} and~\ref{sec:concl} discuss the limitations and conclude.
+
+%% =====================  II. LITERATURE REVIEW  =====================
+\section{Literature Review}\label{sec:lit}
+DTC was introduced for induction machines by Takahashi and Noguchi \cite{takahashi1986} and by Depenbrock \cite{depenbrock1988}. Habetler \emph{et al.}\ \cite{habetler1992} combined DTC with space-vector modulation, and Buja and Kazmierkowski \cite{buja2004} survey the family of DTC schemes. For PMSM drives, Zhong \emph{et al.}\ \cite{zhong1997} analysed the behaviour of DTC, Tang \emph{et al.}\ \cite{tang2004} proposed a low-ripple SVM-DTC for interior PMSMs, and Morales-Caporal \emph{et al.}\ \cite{morales2018} reported a DSP implementation for electric vehicles. The stator flux estimate is central to all of these schemes; Hu and Wu \cite{hu1998} addressed the drift of pure integration, while Kadjoudj \emph{et al.}\ \cite{kadjoudj2007} and Haque and Rahman \cite{haque2000} studied the sensitivity to stator-resistance error.
+
+On the web-handling side, Koc \emph{et al.}\ \cite{koc2002} modelled winding systems for elastic webs and designed a robust tension controller, and Pagilla \emph{et al.}\ \cite{pagilla2007} developed decentralised control for multi-section web lines. These works establish that the radius and inertia variation is the dominant disturbance and that feedforward or gain scheduling is needed for good transient behaviour. What is less common is a comparison of two drive-level torque-control schemes on the same variable-inertia plant with the same outer tension loop. The present study keeps the drive models simple and standard, and concentrates on that interaction.
+
+%% =====================  III. WINDER PLANT MODEL  =====================
+\section{Winder Plant Model}\label{sec:plant}
+\subsection{Roll kinematics and variable inertia}
+The winder is described by the roll radius $r$, the web tension $F$ and the roll speed $\omega$. With web density $\rho$, width $w$, thickness $h$ and core radius $r_c$, the roll mass and the total inertia are
+\begin{align}
+m(r) &= \rho w \pi \left(r^2-r_c^2\right), \label{eq:mass}\\
+J(r) &= J_m + J_c + \tfrac12 m(r)\left(r^2+r_c^2\right), \label{eq:J}
+\end{align}
+where $J_m$ is the motor inertia and $J_c$ the core and shaft inertia. The mechanical dynamics are written in momentum form,
+\begin{equation}
+\frac{dH}{dt}=T_e-\mathrm{mode}\,F r-B\omega,\qquad H=J(r)\,\omega, \label{eq:mom}
+\end{equation}
+with $\mathrm{mode}=+1$ for winding and $-1$ for unwinding. This form is used deliberately: expanding $d(J\omega)/dt$ gives $J\dot\omega+\omega\dot J$, so the $\omega\dot J$ term is carried by the state equation instead of being added as an artificial load torque. During winding ($\dot J>0$) it acts as an extra drag; during unwinding ($\dot J<0$) it acts as an extra acceleration.
+
+The radius evolves with the line speed $v_{\rm line}$ under the no-slip assumption,
+\begin{equation}
+\frac{dr}{dt}=\mathrm{mode}\,\frac{h\,v_{\rm line}}{2\pi r}, \label{eq:r}
+\end{equation}
+and the roll surface speed is $v_{\rm surf}=\omega r$.
+
+\subsection{Web tension}
+The web is represented by a Kelvin--Voigt element \cite{findley1989} between the line and the roll. With stiffness $K=EA/L$ and damping $C$, the tension is
+\begin{equation}
+F=Kx+C\dot x,\qquad \dot x=\mathrm{mode}\left(v_{\rm surf}-v_{\rm line}\right), \label{eq:web}
+\end{equation}
+where $x$ is the web extension and $A=wh$ the web cross-section. The damping term is what limits the resonance of the elastic web; without it, the tension oscillates after a speed change. The tension is clamped to $[0,F_{\max}]$ because a web cannot push. Figure~\ref{fig:plant} shows the block diagram of the plant: the torque balance gives the roll speed, the radius block gives $r$, and the web block turns the surface-speed difference into tension.
+
+\begin{figure}[!t]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[x=1cm,y=1cm]
+% main row
+\node[lab] (te) at (-6.0,0) {$T_e$};
+\node[sm] (s1) at (-5.0,0) {$-$};
+\node[blk,minimum width=28mm,minimum height=13mm] (roll) at (-3.0,0) {Roll\\dynamics};
+\node[blk,minimum width=28mm,minimum height=15mm] (surf) at (0.4,0) {Surface\\speed};
+\node[sm] (s2) at (3.0,0) {$-$};
+\node[blk,minimum width=28mm,minimum height=13mm] (web) at (5.4,0) {Web\\tension};
+\node[lab] (F) at (7.2,0) {$F$};
+\draw[arr] (te) -- (s1);
+\draw[arr] (s1) -- (roll);
+\draw[arr] (roll) -- node[lab,above]{$\omega$} (surf);
+\draw[arr] (surf) -- (s2);
+\draw[arr] (s2) -- (web);
+\draw[arr] (web) -- (F);
+% load torque and line speed
+\draw[arr] (-5.0,-1.7) -- (s1.south);
+\node[lab,left] at (-5.15,-1.55) {$T_L=\mathrm{mode}\,Fr$};
+\draw[arr] (3.0,-1.6) -- (s2.south);
+\node[lab,right] at (3.2,-1.5) {$v_{\rm line}$};
+% radius chain
+\node[lab] (vl1) at (-6.0,-3.0) {$v_{\rm line}$};
+\node[blk,minimum width=24mm,minimum height=13mm] (rad) at (-3.6,-3.0) {Radius};
+\draw[arr] (vl1) -- (rad);
+\draw[arr] (rad.east) -- (0.4,-3.0) -- (surf.south);
+\node[lab,above] at (-0.6,-2.85) {$r$};
+\end{tikzpicture}}
+\caption{Block diagram of the winder plant: roll dynamics, radius, surface speed and web tension. The equations are given in Section~\ref{sec:plant}.}
+\label{fig:plant}
+\end{figure}
+
+\subsection{Line-speed reference}
+The line speed is not a controller; it is the command that the machine would receive from the operator or the master PLC. A linear ramp has a slope discontinuity at both ends, which excites the web resonance. A cubic S-curve \cite{biagiotti2008} is used instead:
+\begin{equation}
+\tau=\operatorname{sat}\!\left(\frac{t}{T_{\rm ramp}},0,1\right),\qquad
+v_{\rm line}=v_{\rm set}\left(3\tau^2-2\tau^3\right), \label{eq:scurve}
+\end{equation}
+with the analytic derivative
+\begin{equation}
+\dot v_{\rm line}=\frac{v_{\rm set}}{T_{\rm ramp}}\left(6\tau-6\tau^2\right), \label{eq:scurve_d}
+\end{equation}
+which is zero at both ends and is used by the feedforward.
+
+\subsection{Parameters}
+Table~\ref{tab:par} lists the plant and drive parameters. The mechanical values are illustrative, chosen so that the roll spans a realistic radius and inertia range inside the torque and speed limits of the available motor; they are not experimental data.
+
+\begin{table}[!t]
+\centering
+\caption{Plant and drive parameters.}
+\label{tab:par}
+\singlespacing
+\begin{tabular}{lcc}
+\toprule
+Parameter & Symbol & Value \\
+\midrule
+Web density & $\rho$ & 800~kg/m$^3$ \\
+Web width, thickness & $w,\ h$ & 0.30~m, 0.5~mm \\
+Young's modulus, free length & $E,\ L$ & 2.0~GPa, 1.0~m \\
+Core radius, maximum radius & $r_c,\ r_{\max}$ & 0.05~m, 0.12~m \\
+Initial radius, winding / unwinding & $r_0$ & 0.06 / 0.115~m \\
+Core, motor inertia & $J_c,\ J_m$ & 0.005, $8\times10^{-4}$~kg$\cdot$m$^2$ \\
+Web damping & $C$ & 500~N$\cdot$s/m \\
+Tension setpoint & $F^*$ & 15~N \\
+Line speed, ramp time & $v_{\rm set},\ T_{\rm ramp}$ & 1.2~m/s, 1.0~s \\
+Stator resistance & $R_s$ & 2.875~$\Omega$ \\
+$d$/$q$ inductance & $L_d=L_q$ & 8.5~mH \\
+PM flux linkage & $\lambda_f$ & 0.175~Wb \\
+Pole pairs & $p$ & 4 \\
+DC bus & $V_{dc}$ & 300~V \\
+Control period & $T_s$ & 20~\textmu s \\
+PWM carrier & $f_{sw}$ & 5~kHz \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%% =====================  IV. CONTROL ARCHITECTURE  =====================
+\section{Control Architecture}\label{sec:control}
+The drive is speed-controlled; the tension loop therefore acts by trimming the speed reference, which is the industrial ``draw'' principle. The architecture has three parts: a tension PI, a radius feedforward and a model-based torque feedforward. The two drives were developed and verified in the mid-semester study; their block diagrams are reproduced in Figs.~\ref{fig:classic} and~\ref{fig:svm}. Their integration with the common winder plant and the tension architecture is shown in Fig.~\ref{fig:arch}.
+
+
+
+\subsection{Tension loop}
+With the measured (filtered) tension $F$ and the reference $F^*$, the speed reference is
+\begin{equation}
+\omega^*=\operatorname{sat}\!\left(\frac{v_{\rm line}}{r}+\mathrm{mode}\,(u+b),\,\omega_{\min},\omega_{\max}\right), \label{eq:wo}
+\end{equation}
+\begin{equation}
+u=K_{pF}\left(F^*-F\right)+K_{iF}\!\int\!\left(F^*-F\right)dt,\qquad |u|\le u_{\max}, \label{eq:pi}
+\end{equation}
+\begin{equation}
+b=u_{\rm take}\operatorname{sat}\!\left(1-\frac{F}{F_{\rm slack}},0,1\right). \label{eq:bias}
+\end{equation}
+The first term of (\ref{eq:wo}) is the radius feedforward: it makes the roll surface speed match the line as $r$ changes, so the PI only corrects the residual. The $\mathrm{mode}$ factor reverses the correction: in winding, a low tension requires a faster roll; in unwinding, it requires a slower roll. The bias $b$ adds a small take-up draw when the web is nearly slack, which prevents the PI from winding up against a zero measurement. The PI output is limited to $u_{\max}=0.2\rads$ and the reference is kept inside $[0,60]\rads$.
+
+\subsection{Radius feedforward}
+The radius feedforward is the kinematic term $v_{\rm line}/r$. It is exact in steady state and removes the radius dependence from the operating point of the PI. Without it, the loop gain would change by a factor of about four as the roll fills.
+
+\subsection{Torque feedforward}
+The torque balance (\ref{eq:mom}) contains three predictable terms: the inertia torque, the web load and the friction. The feedforward uses the reference speed and the measured radius to reconstruct them:
+\begin{equation}
+T_{\rm ff}=J\,\dot\omega^*+\frac{dJ}{dr}\,\dot r\,\omega^*+\mathrm{mode}\,F^*r+B\,\omega^*, \label{eq:ff}
+\end{equation}
+with
+\begin{equation}
+\frac{dJ}{dr}=2\rho w\pi r^3,\qquad \dot r=\mathrm{mode}\,\frac{h\,v_{\rm line}}{2\pi r}. \label{eq:dJ}
+\end{equation}
+The term $J\dot\omega^*$ supplies the acceleration torque during the ramp, the term $(dJ/dr)\dot r\,\omega^*$ accounts for the changing inertia, the term $\mathrm{mode}\,F^*r$ is the web load, and $B\omega^*$ the friction. The feedforward is injected at the torque-reference port, so the PI only has to correct the modelling error and the measurement noise.
+
+\subsection{Tuning and limits}
+The plant from a speed increment $\Delta\omega$ to tension is an integrator with gain $Kr$, where $K=EA/L=3\times10^5$~N/m. With a target bandwidth $\omega_n=4\rads$ and damping $\zeta=1$,
+\begin{equation}
+K_{pF}=\frac{2\zeta\omega_n}{Kr},\qquad K_{iF}=\frac{\omega_n^2}{Kr}, \label{eq:tune}
+\end{equation}
+which gives $K_{pF}=4.4\times10^{-4}$ and $K_{iF}=8.9\times10^{-4}$ at $r=0.06$~m. The tension loop is deliberately much slower than the speed loop (about 0.6~Hz against 20~Hz), so the two do not interact. The measured tension is filtered by a first-order low-pass with a 2~Hz cutoff, which adds about $18^\circ$ of phase lag at the tension-loop bandwidth. The filter is initialised at the setpoint so that the loop starts without a transient.
+
+%% =====================  V. DRIVE SCHEMES  =====================
+\section{Drive Schemes}\label{sec:drives}
+Both drives use the same surface-mounted PMSM \cite{pillay1989}, the same two-level inverter, the same speed loop and the same tension loop. Only the torque and flux actuation differs, which is what makes the comparison meaningful. Both schemes were modelled, tuned and verified in the mid-semester study; they are reused here without modification, and their block diagrams are reproduced below.
+
+\subsection{Classical DTC}
+The stator flux and torque are estimated from the measured currents and the applied voltage. The flux error and the torque error drive two hysteresis comparators, and the outputs select an active or zero voltage vector from a switching table according to the flux sector. The torque ripple is set by the hysteresis band and by the variable switching frequency.
+
+\begin{figure}[!t]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}
+\node[lab] (wref) at (-5.6,0) {$\omega^*$};
+\node[sm] (sw) at (-4.6,0) {$-$};
+\node[blk,minimum width=20mm] (spi) at (-2.8,0) {Speed\\PI};
+\node[sm] (st) at (-0.4,0) {$-$};
+\node[blk,minimum width=24mm,minimum height=14mm] (ht) at (2.0,0) {Torque\\hyst.\\3-level};
+\node[blk,minimum width=28mm,minimum height=16mm] (sect) at (5.8,0) {Sector\\+ table};
+\node[blk,minimum width=18mm] (inv) at (9.0,0) {Inverter};
+\node[blk,minimum width=16mm] (pm) at (11.6,0) {PMSM};
+\node[lab] (lref) at (-6.6,-3.0) {$\lambda^*$};
+\node[sm] (sl) at (-5.0,-3.0) {$-$};
+\node[blk,minimum width=24mm,minimum height=14mm] (hl) at (-2.5,-3.0) {Flux\\hyst.\\2-level};
+\node[blk,minimum width=55mm,minimum height=12mm] (est) at (1.8,3.8) {Estimator\\$\hat\lambda_s,\ \hat\theta_s,\ \hat T_e$};
+\draw[arr] (wref) -- (sw);
+\draw[arr] (sw) -- (spi);
+\draw[arr] (spi) -- node[lab,above]{$T_e^*$} (st);
+\draw[arr] (st) -- (ht);
+\draw[arr] (ht) -- node[lab,above]{$d_\tau$} (sect);
+\draw[arr] (sect) -- node[lab,above]{$S_{abc}$} (inv);
+\draw[arr] (inv) -- (pm);
+\draw[arr] (lref) -- (sl);
+\draw[arr] (sl) -- (hl);
+\draw[arr] (hl.east) -- ++(1.2,0) -| (sect.south);
+\node[lab,above] at (2.0,-2.75) {$d_\lambda$};
+\draw[arr] (est.west) -- ++(-6.05,0) |- (-5.0,-3.6) -- (sl.south);
+\node[lab,left] at (-7.15,0.8) {$\hat\lambda_s$};
+\draw[arr] ([xshift=-12mm]est.south) -- ++(0,-2.4) -| (st.north);
+\node[lab,right] at (0.7,1.5) {$\hat T_e$};
+\draw[arr] (est.east) -- (5.8,3.8) -- (sect.north);
+\node[lab,above] at (5.2,3.92) {$\hat\theta_s$};
+\draw[arr] (pm.north) -- ++(0,4.5) -| (est.north);
+\node[lab,above] at (6.5,5.15) {$i_{abc}$};
+\draw[arr] (pm.south) -- ++(0,-5.0) -- (-4.2,-5.5) -- (-4.2,-0.8) -- (-4.6,-0.8) -- (sw.south);
+\node[lab,above] at (3.0,-5.2) {$\omega$};
+\end{tikzpicture}}
+\caption{Conventional DTC: flux and torque hysteresis, sector detection and switching table. The scheme was developed and verified in the mid-semester study.}
+\label{fig:classic}
+\end{figure}
+
+\subsection{SVM-DTC}
+The hysteresis comparators and the switching table are replaced by two PI controllers in a frame aligned with the estimated stator-flux vector: the flux error gives the voltage component along the flux, and the torque error gives the component perpendicular to it. The command is rotated back to the stationary frame and applied through a fixed-frequency PWM modulator at 5~kHz. The estimator uses the voltage actually applied by the inverter, averaged over the control period, rather than the commanded voltage.
+
+\begin{figure}[!t]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}
+\node[lab] (lref) at (-6.0,1.6) {$\lambda^*$};
+\node[sm] (sl) at (-5.0,1.6) {$-$};
+\node[blk,minimum width=18mm] (pif) at (-3.0,1.6) {PI\\(flux)};
+\node[lab] (tref) at (-6.0,-0.8) {$T_e^*$};
+\node[sm] (st) at (-5.0,-0.8) {$-$};
+\node[blk,minimum width=18mm] (pit) at (-3.0,-0.8) {PI\\(torque)};
+\node[blk,minimum width=30mm,minimum height=18mm] (rot) at (0.8,0.4) {Rotate\\by $\hat\theta_s$};
+\node[blk,minimum width=30mm,minimum height=16mm] (cl) at (4.4,0.4) {Inverse Clarke\\+ min--max};
+\node[blk,minimum width=18mm] (pwm) at (7.8,0.4) {PWM\\5 kHz};
+\node[blk,minimum width=18mm] (inv) at (10.4,0.4) {Inverter};
+\node[blk,minimum width=16mm] (pm) at (13.0,0.4) {PMSM};
+\node[blk,minimum width=55mm,minimum height=12mm] (est) at (2.0,-4.0) {Estimator\\$\hat\lambda_s,\ \hat\theta_s,\ \hat T_e$};
+\draw[arr] (lref) -- (sl);
+\draw[arr] (sl) -- (pif);
+\draw[arr] (tref) -- (st);
+\draw[arr] (st) -- (pit);
+\draw[arr] (pif.east) -- ++(1.2,0) |- ([yshift=4mm]rot.west);
+\draw[arr] (pit.east) -- ++(1.2,0) |- ([yshift=-4mm]rot.west);
+\node[lab,above] at (-1.2,1.8) {$v_M^*$};
+\node[lab,below] at (-1.2,-1.0) {$v_T^*$};
+\draw[arr] (rot) -- (cl);
+\draw[arr] (cl) -- (pwm);
+\draw[arr] (pwm) -- (inv);
+\draw[arr] (inv) -- (pm);
+\draw[arr] (est.west) -- ++(-5.9,0) |- (-5.0,2.4) -- (sl.north);
+\node[lab,left] at (-6.75,0.4) {$\hat\lambda_s$};
+\draw[arr] ([xshift=-12mm]est.north) -- ++(0,1.8) -| (st.south);
+\draw[arr] (est.east) -- (6.25,-4.0) -- (6.25,-1.2) -- (0.8,-1.2) -- (rot.south);
+\node[lab,left] at (6.1,-2.0) {$\hat\theta_s$};
+\draw[arr] (pm.south) -- ++(0,-4.8) -| (est.south);
+\node[lab,above] at (8.5,-4.65) {$i_{abc}$};
+\end{tikzpicture}}
+\caption{SVM-DTC: flux and torque PIs, rotation by the estimated flux angle, inverse Clarke and fixed-frequency PWM. The scheme was developed and verified in the mid-semester study.}
+\label{fig:svm}
+\end{figure}
+
+\subsection{Integration with the winder}
+The two drives are connected to the common winder plant and the tension architecture of Section~\ref{sec:control}. Figure~\ref{fig:arch} shows the combined system.
+
+\begin{figure}[!t]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}
+\node[blk,minimum width=24mm] (lr) at (0,0) {Line-speed\\reference};
+\node[blk,minimum width=26mm] (tc) at (3.6,0) {Tension\\control};
+\node[blk,minimum width=18mm] (pi) at (7.2,0) {Speed\\PI};
+\node[sm] (sum) at (9.2,0) {$+$};
+\node[blk,minimum width=28mm] (dr) at (11.8,0) {DTC /\\SVM-DTC};
+\node[blk,minimum width=18mm] (inv) at (15.2,0) {Inverter};
+\node[blk,minimum width=16mm] (pm) at (18.2,0) {PMSM};
+\node[blk,minimum width=24mm] (wp) at (21.6,0) {Winder\\plant};
+\node[blk,minimum width=32mm,minimum height=14mm] (ff) at (9.2,2.7) {Torque\\feedforward};
+\draw[arr] (lr) -- node[lab,above]{$v_{\rm line}$} (tc);
+\draw[arr] (tc) -- node[lab,above]{$\omega^*$} (pi);
+\draw[arr] (pi) -- node[lab,above]{$T_e^*$} (sum);
+\draw[arr] (sum) -- (dr);
+\draw[arr] (dr) -- node[lab,above]{gates} (inv);
+\draw[arr] (inv) -- node[lab,above]{$v_{abc}$} (pm);
+\draw[arr] (pm) -- node[lab,above]{$T_e$} (wp);
+\draw[arr] (wp.south) -- ++(0,-1.2) -| node[lab,below,pos=0.2]{$F$} (tc.south);
+\draw[arr] (pm.south) -- ++(0,-1.9) -| node[lab,below,pos=0.25]{$\omega$} (pi.south);
+\draw[arr] (wp.north) -- (21.6,2.7) -- node[lab,above,pos=0.5]{$r,\,J$} (ff.east);
+\draw[arr] (lr.north) -- (0,2.7) -| node[lab,above,pos=0.15]{$v_{\rm line}$} (ff.west);
+\draw[arr] (ff.south) -- node[lab,right]{$T_{\rm ff}$} (sum.north);
+\end{tikzpicture}}
+\caption{Combined PMSM drive and winder plant with the tension architecture. The tension loop trims the speed reference; the torque feedforward adds the predictable part of the load torque.}
+\label{fig:arch}
+\end{figure}
+
+\subsection{Common test conditions}
+The control period is 20~\textmu s, the DC bus is 300~V, the torque limit is $5\Nm$, and the tension setpoint is 15~N. The line speed follows the S-curve of (\ref{eq:scurve}) with a 1~s ramp to 1.2~m/s unless stated otherwise. Winding starts at $r_0=0.06$~m and unwinding at $r_0=0.115$~m. The same tension gains, filter and feedforward are used for both drives, and the feedforward is switched off only for the comparison in Section~\ref{sec:ff}.
+
+%% =====================  VI. RESULTS  =====================
+\section{Results}\label{sec:res}
+\subsection{Effect of the feedforward}\label{sec:ff}
+Figure~\ref{fig:ff} compares the tension RMSE with and without feedforward for the four nominal cases. Without feedforward the PI has to supply the whole acceleration torque: the tension overshoots to 21--23~N and takes about 1.5~s to recover, giving an RMSE of about 6.2~N in winding. With feedforward the RMSE falls to 0.77~N for SVM-DTC and 0.27~N for classical DTC in winding, and to 0.05~N and 0.10~N in unwinding. The reduction is 88--98\%. The torque never reaches the 5~N$\cdot$m limit in any of the cases.
+
+\begin{figure}[!t]
+\centering
+\figgraphic{0.95}{figures/fig_ff_summary.png}
+\caption{Tension RMSE with feedforward off and on (left) and torque ripple with feedforward on (right), for the four nominal cases.}
+\label{fig:ff}
+\end{figure}
+
+The feedforward also removes the large transient at the start of the ramp. Without it, the tension collapse and the subsequent overshoot are visible in the tension trace; with it, the tension stays close to the setpoint from the beginning of the acceleration. This is the expected behaviour: the disturbance is predictable, so it should not be left to the feedback loop.
+
+\subsection{Winding and unwinding}
+Table~\ref{tab:main} lists the four feedforward-on cases, and Figs.~\ref{fig:cw} and~\ref{fig:sw} show the corresponding six-panel results for winding. Both drives regulate the mean tension at 15~N. The classical drive is tighter in steady winding tension (14.0--15.9~N), but its torque ripple is about $0.42\Nm$, roughly six times that of SVM-DTC, and its peak current is higher (1.98 against 1.22~A). SVM-DTC is electrically smoother, but its winding tension shows a residual oscillation during the ramp, with a minimum of about 10~N and a maximum of about 17~N. In unwinding both drives are tight: the SVM RMSE is 0.05~N and the classical RMSE is 0.10~N, and the radius and inertia fall as the roll empties. Figure~\ref{fig:overlay} overlays the two drives for the three signals that differ; the radius, inertia and speed are essentially common.
+
+\begin{table}[!t]
+\centering
+\caption{Feedforward-on results (2~s, 15~N setpoint).}
+\label{tab:main}
+\singlespacing
+\begin{tabular}{lcccc}
+\toprule
+Case & $F$ RMSE (N) & $F$ range (N) & $T_e$ ripple (N$\cdot$m) & $I_a$ peak (A) \\
+\midrule
+SVM wind & 0.77 & 10.0--17.3 & 0.072 & 1.22 \\
+SVM unwind & 0.05 & 8.8--17.4 & 0.019 & 1.72 \\
+Classical wind & 0.27 & 14.0--15.9 & 0.418 & 1.98 \\
+Classical unwind & 0.10 & 13.4--16.7 & 0.416 & 2.55 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[!t]
+\centering
+\figgraphic{0.98}{figures/fig_classic_wind.png}
+\caption{Classical DTC, winding, feedforward on: tension, speed, radius, inertia, torque and surface-speed mismatch over 2~s.}
+\label{fig:cw}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\figgraphic{0.98}{figures/fig_svm_wind.png}
+\caption{SVM-DTC, winding, feedforward on. The electrical ripple is much smaller than in Fig.~\ref{fig:cw}, but the tension shows a residual oscillation during the ramp.}
+\label{fig:sw}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\figgraphic{0.98}{figures/fig_overlay3.png}
+\caption{Overlay of the two drives for the three signals that differ: web tension, motor torque and surface-speed mismatch (winding, feedforward on).}
+\label{fig:overlay}
+\end{figure}
+
+\subsection{Robustness}
+The comparison was repeated over line speed (0.8, 1.2 and 1.6~m/s), initial radius (0.06, 0.08 and 0.10--0.115~m) and a 3~N tension step. Table~\ref{tab:rob} summarises the range. With feedforward on, the tension RMSE stays between 0.05 and 1.97~N in all the cases, and no case saturates the torque. The largest error is the tension step, which is a feedback-limited transient; the line-speed and radius variations are handled by the feedforward and change the RMSE only modestly.
+
+\begin{table}[!t]
+\centering
+\caption{Robustness of the tension RMSE (N, feedforward on).}
+\label{tab:rob}
+\singlespacing
+\begin{tabular}{lcc}
+\toprule
+Condition & SVM-DTC & Classical DTC \\
+\midrule
+Nominal winding & 0.77 & 0.27 \\
+Line speed 0.8~m/s & 0.44 & 0.26 \\
+Line speed 1.6~m/s & 0.67 & 0.31 \\
+Initial radius 0.08~m & 0.64 & 0.22 \\
+Tension step, 3~N & 1.97 & 1.83 \\
+Nominal unwinding & 0.05 & 0.10 \\
+Unwinding, $r_0=0.10$~m & 0.37 & 0.11 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\ifextras
+\begin{figure}[!t]
+\centering
+\figgraphic{0.98}{figures/fig_svm_unwind.png}
+\caption{SVM-DTC, unwinding, feedforward on: the radius and the inertia fall and the tension stays close to 15~N.}
+\label{fig:su}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\figgraphic{0.98}{figures/fig_classic_unwind.png}
+\caption{Classical DTC, unwinding, feedforward on.}
+\label{fig:cu}
+\end{figure}
+\fi
+
+%% =====================  VIII. DISCUSSION  =====================
+\section{Discussion}\label{sec:disc}
+The results show a clear division of labour. The feedforward is the dominant enabler: it removes the predictable inertia and load torque, and the PI is left with a small correction. This is why the RMSE drops by almost two orders of magnitude in unwinding and by a factor of eight in SVM winding. The radius feedforward is also necessary, but it is a steady-state term; it cannot supply the acceleration torque, which is why the full torque feedforward is what changes the transient.
+
+The drive comparison is more nuanced than ``SVM is better''. SVM-DTC is clearly better electrically: about six times lower torque ripple in winding, about twenty times lower in unwinding, and a lower peak current. Classical DTC, however, gives tighter steady tension in winding. The reason is that the switching table acts as a natural filter and the classical speed loop tracks slightly better in this operating point, while the SVM voltage command and estimator interact with the tension loop during the ramp. This residual oscillation is the main open issue; it is bounded and does not saturate the drive, but it is visible in the tension trace.
+
+Several limitations should be stated. The study is a simulation study; the mechanical parameters are illustrative and have not been identified from a machine. The web damping is constant, the inverter is ideal (no dead time), and the tension loop uses a speed trim rather than a torque-mode winder control. The gains are fixed; a radius-scheduled gain would be the natural next step. Finally, the comparison covers one motor and one inverter, so the absolute numbers are not universal.
+
+%% =====================  IX. CONCLUSION  =====================
+\section{Conclusion and Future Work}\label{sec:concl}
+A physically consistent winder plant was built, and a tension architecture with radius and torque feedforward was applied identically to classical DTC and SVM-DTC. Feedforward reduces the tension RMSE by 88--98\% and avoids torque saturation. SVM-DTC reduces the torque ripple by roughly an order of magnitude and lowers the peak current, while classical DTC gives slightly tighter steady tension in winding; a residual oscillation remains in the SVM winding case. The results quantify the trade-off between electrical smoothness and tension regulation for winder drives.
+
+Future work will address the SVM winding oscillation, add a torque-mode winder loop, schedule the tension gains with the radius, include inverter dead time and parameter uncertainty, and validate the model against an experimental winder.
+
+%% =====================  REFERENCES  =====================
+\bibliographystyle{IEEEtran}
+\bibliography{refs,refs_winder}
+
+\end{document}

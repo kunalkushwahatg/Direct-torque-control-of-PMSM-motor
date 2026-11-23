@@ -1,0 +1,16 @@
+* text=auto
+
+# Simulink / MATLAB binary files
+*.slx binary
+*.mdl binary
+*.mat binary
+*.fig binary
+*.slxc binary
+
+# Documents and images
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ttf binary
+*.otf binary

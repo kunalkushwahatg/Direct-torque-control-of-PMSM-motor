@@ -1,0 +1,498 @@
+%% Mid-semester review report - PMSM Drive using Direct Torque Control
+%% Compile with XeLaTeX (real Times New Roman from ./fonts) - Overleaf: Menu > Compiler > XeLaTeX.
+%% If compiled with pdfLaTeX it falls back to a Times-compatible font automatically.
+\documentclass[12pt,a4paper,onecolumn]{IEEEtran}
+
+\usepackage{iftex}
+\ifXeTeX
+  \usepackage{fontspec}
+  \setmainfont{times.ttf}[Path=./fonts/, BoldFont=timesbd.ttf, ItalicFont=timesi.ttf, BoldItalicFont=timesbi.ttf]
+  \usepackage{amsmath}
+  \usepackage{unicode-math}
+  \setmathfont{TeX Gyre Termes Math}
+\else
+  \usepackage[T1]{fontenc}
+  \usepackage{mathptmx}
+  \usepackage{amsmath,amssymb}
+\fi
+\usepackage[a4paper,top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm]{geometry}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{cite}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\setstretch{1.5}
+
+% ---------- length switches: use \extrasfalse / \toctrue to change the length ----------
+\newif\ifextras \extrastrue   % optional figures (current spectrum, estimated-vs-true flux, classical-DTC Simulink model)
+\newif\iftoc \tocfalse         % contents page
+
+% ---------- clickable references (links open the paper through its DOI) ----------
+\usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=blue]{hyperref}
+
+% ---------- small helpers ----------
+\newcommand{\Nm}{\,\mathrm{N\cdot m}}
+\newcommand{\Wb}{\,\mathrm{Wb}}
+\newcommand{\rads}{\,\mathrm{rad/s}}
+\tikzset{
+  blk/.style={draw,rectangle,minimum height=9mm,minimum width=17mm,align=center,font=\footnotesize,inner sep=2pt},
+  sm/.style={draw,circle,inner sep=0pt,minimum size=5mm,font=\scriptsize},
+  arr/.style={-{Stealth[length=2mm]}},
+  lab/.style={font=\scriptsize,inner sep=1pt}
+}
+\newcommand{\figgraphic}[2]{\includegraphics[width=#1\linewidth]{#2}}
+
+\begin{document}
+
+%% =====================  COVER PAGE  =====================
+\thispagestyle{empty}
+\begin{center}
+\singlespacing
+\vspace*{0.3cm}
+\includegraphics[width=3.4cm]{figures/nitrkl.jpg}\\[0.8cm]
+{\Large \textbf{Mid Semester Research Project-I Report}}\\[1.0cm]
+{\Huge \textbf{PMSM Drive using\\ Direct Torque Control}}\\[1.4cm]
+{\large Submitted by}\\[0.3cm]
+{\Large \textbf{Kunal Kushwaha}}\\[0.2cm]
+{\large Roll No.\ 123EE0291}\\[1.2cm]
+{\large Under the guidance of}\\[0.3cm]
+{\Large \textbf{Prof.\ Krishna Roy}}\\[1.4cm]
+{\large Department of Electrical Engineering}\\[0.2cm]
+{\large National Institute of Technology Rourkela}\\[0.2cm]
+{\large Odisha, India -- 769008}\\[0.8cm]
+{\large 06 October 2026}\\[1.8cm]
+\hfill\begin{tabular}{c}
+\rule{6.5cm}{0.4pt}\\
+\small Signature of the supervisor
+\end{tabular}
+\end{center}
+\clearpage
+\setcounter{page}{1}
+
+%% =====================  ABSTRACT  =====================
+\begin{center}\textbf{\large Abstract}\end{center}
+\noindent This report describes the work done so far on a permanent magnet synchronous motor (PMSM) drive with direct torque control (DTC). Simulation models of two DTC schemes were built in MATLAB/Simulink/Simscape Electrical: the conventional hysteresis-based DTC, and DTC with space vector modulation (DTC-SVM), in which two PI controllers in a stator-flux-aligned frame replace the switching table and a fixed-frequency PWM is used. These two models were used as test platforms. Under the same 20~\textmu s control period, DTC-SVM gave an RMS torque ripple of 0.08\,N$\cdot$m against 0.45\,N$\cdot$m at 2\,N$\cdot$m load, a current distortion (to 20~kHz) of 4.7\% against 26\%, and a fixed 5~kHz switching frequency, with similar speed response. A test with an incorrect stator resistance in the flux estimator showed that both schemes lose control when the assumed resistance is 5\% or more above the true value at 20\,rad/s, and at 5\,rad/s for every error tested, including $-10\%$. No significant new approach has been identified yet; the report documents the models, the test results and the weakness found.
+
+\vspace{0.2cm}
+\noindent\textit{Keywords:} direct torque control, PMSM, space vector modulation, torque ripple, stator resistance, flux estimation.
+
+\iftoc\clearpage\tableofcontents\clearpage\fi
+
+%% =====================  I. INTRODUCTION  =====================
+\section{Introduction}
+Permanent magnet synchronous motors are widely used in electric vehicles and industrial drives because of their high efficiency and power density. Their torque is commonly controlled either by field-oriented control, which regulates the stator currents in the rotor reference frame, or by direct torque control (DTC) \cite{takahashi1986,depenbrock1988}. In conventional DTC (also called classical or basic DTC) the stator flux and electromagnetic torque are estimated from the measured currents and the inverter voltage, compared with their references through hysteresis comparators, and the inverter voltage vector that corrects the errors is selected from a switching table. DTC has a fast torque response and needs neither current regulators nor the rotor position for the flux and torque estimates, which makes it attractive for PMSM drives \cite{zhong1997,morales2018}.
+
+Conventional DTC is known to have a relatively large torque and flux ripple and a variable inverter switching frequency \cite{buja2004}. The accuracy of the drive depends on the stator flux estimate, which is obtained by integrating the motor voltage minus the resistive drop, and is therefore affected by errors in the stator resistance, especially at low speed \cite{kadjoudj2007,haque2000}. A common modification is DTC with space vector modulation (DTC-SVM), in which a voltage command is applied through a modulator, giving a fixed switching frequency and a lower ripple \cite{habetler1992,tang2004}.
+
+This project concerns direct torque control of PMSM drives. So far, simulation models of conventional DTC and DTC-SVM have been built and used as test platforms, to (i) evaluate their torque, flux and current behaviour under defined test conditions, and (ii) test how they react to an incorrect stator resistance in the flux estimator. The work is not restricted to these two schemes, and other DTC variants and estimators can be studied on the same platform. At this stage no significant new approach has been identified. Section~II reviews the literature, Section~III describes the models and methods, Section~IV gives the results, and Sections~V and VI give the conclusions and the directions for further work.
+
+%% =====================  II. LITERATURE REVIEW  =====================
+\section{Literature Review}
+DTC was introduced for induction motors by Takahashi and Noguchi \cite{takahashi1986}, who selected one of the six active inverter voltage vectors from a table using the outputs of flux and torque hysteresis comparators, and by Depenbrock as direct self control \cite{depenbrock1988}. Habetler \emph{et al.}\ \cite{habetler1992} combined DTC with space vector modulation (DTC-SVM) for induction machines, reporting reduced torque fluctuations compared with conventional DTC. A survey of DTC and its variants for PWM inverter-fed AC machines is given by Buja and Kazmierkowski \cite{buja2004}.
+
+For permanent magnet machines, the dynamic model of the PMSM drive was presented by Pillay and Krishnan \cite{pillay1989}. Zhong \emph{et al.}\ \cite{zhong1997} analysed DTC of PMSM drives. Tang \emph{et al.}\ \cite{tang2004} proposed a DTC of an interior PMSM that combines DTC with space vector modulation to obtain low flux and torque ripple and a fixed switching frequency. Morales-Caporal \emph{et al.}\ \cite{morales2018} implemented the classical DTC of a PMSM for electric-vehicle propulsion on a DSP and report experimental results.
+
+The stator flux estimate is a central element of every DTC scheme. Hu and Wu \cite{hu1998} proposed integration algorithms for estimating motor flux over a wide speed range, addressing the drift of pure integration. Kadjoudj \emph{et al.}\ \cite{kadjoudj2007} discuss the problems of stator flux estimation in DTC of PMSM drives, and Haque and Rahman \cite{haque2000} describe the effect of stator resistance variation on a DTC interior PMSM drive and propose a PI compensator for it. In the present work no new estimator is proposed; the sensitivity of the two schemes to an incorrect stator resistance is measured.
+
+%% =====================  III. METHODOLOGY  =====================
+\section{System Modelling and Control Methods}
+\subsection{PMSM Model}
+With the amplitude-invariant Clarke transformation
+\begin{equation}
+\begin{bmatrix} x_\alpha\\ x_\beta \end{bmatrix} = \frac{2}{3}\begin{bmatrix} 1 & -\tfrac12 & -\tfrac12\\[2pt] 0 & \tfrac{\sqrt3}{2} & -\tfrac{\sqrt3}{2} \end{bmatrix}\begin{bmatrix} x_a\\ x_b\\ x_c \end{bmatrix} \label{eq:clarke}
+\end{equation}
+and the Park transformation $x_d = x_\alpha\cos\theta_r + x_\beta\sin\theta_r$, $x_q = -x_\alpha\sin\theta_r + x_\beta\cos\theta_r$ ($\theta_r$ is the rotor electrical angle), the surface-mounted PMSM is described in the rotor $dq$ frame by \cite{pillay1989}
+\begin{align}
+v_d &= R_s i_d + \frac{d\lambda_d}{dt} - \omega_e \lambda_q, &\quad v_q &= R_s i_q + \frac{d\lambda_q}{dt} + \omega_e \lambda_d, \label{eq:vdq}\\
+\lambda_d &= L_d i_d + \lambda_f, &\quad \lambda_q &= L_q i_q, \label{eq:lam}\\
+T_e &= \tfrac{3}{2}\,p\,(\lambda_d i_q - \lambda_q i_d), &\quad J\frac{d\omega}{dt} &= T_e - T_L - B\omega, \label{eq:te}
+\end{align}
+where $R_s$ is the stator resistance, $L_d,L_q$ the inductances ($L_d=L_q=L_s$ for a surface-mounted machine), $\lambda_f$ the permanent-magnet flux linkage, $p$ the number of pole pairs, $\omega_e=p\omega$ the electrical speed, $J$ the inertia and $B$ the friction coefficient. In the stationary $\alpha\beta$ frame the torque is
+\begin{equation}
+T_e = \tfrac{3}{2}\,p\,(\lambda_\alpha i_\beta - \lambda_\beta i_\alpha). \label{eq:teab}
+\end{equation}
+Writing the stator flux as $\lambda_s\angle\delta$ relative to the rotor flux, $\lambda_q=\lambda_s\sin\delta = L_s i_q$, and (\ref{eq:te}) becomes
+\begin{equation}
+T_e = \frac{3p}{2}\,\frac{\lambda_f\,\lambda_s}{L_s}\,\sin\delta, \label{eq:angle}
+\end{equation}
+which shows that, at a given flux magnitude, the torque is changed through the angle $\delta$; DTC acts on the torque by changing this angle.
+
+\subsection{Inverter and Voltage Vectors}
+The three-phase two-level inverter, fed by a DC bus $V_{dc}$, has eight switching states $(S_a,S_b,S_c)$. Six give the active voltage vectors $\mathbf{V}_1\ldots\mathbf{V}_6$ of magnitude $\tfrac{2}{3}V_{dc}$, spaced by $60^\circ$, and two give the zero vectors. Applying (\ref{eq:clarke}) to the pole voltages, the inverter voltage in the $\alpha\beta$ frame is
+\begin{equation}
+v_\alpha = \tfrac{V_{dc}}{3}(2S_a - S_b - S_c), \qquad v_\beta = \tfrac{V_{dc}}{\sqrt3}(S_b - S_c). \label{eq:vab}
+\end{equation}
+The six active vectors, the zero vectors and the sectors of the flux plane are shown in Fig.~\ref{fig:hex}, and Fig.~\ref{fig:system} shows the complete drive.
+
+\begin{figure}[!t]
+\centering
+\resizebox{0.62\linewidth}{!}{%
+\begin{tikzpicture}
+\def\R{3.0}
+\foreach \k in {0,...,5}{
+  \draw[thick] ({\R*cos(60*\k)},{\R*sin(60*\k)}) -- ({\R*cos(60*(\k+1))},{\R*sin(60*(\k+1))});
+  \draw[dashed,gray] (0,0) -- ({0.866*\R*cos(30+60*\k)},{0.866*\R*sin(30+60*\k)});
+  \node[font=\scriptsize] at ({0.62*\R*cos(60*\k+20)},{0.62*\R*sin(60*\k+20)}) {$n=\the\numexpr\k+1\relax$};
+}
+\foreach \k/\nm/\bits/\ann in {0/1/100/{}, 1/2/110/{$\lambda\uparrow\ T\uparrow$}, 2/3/010/{$\lambda\downarrow\ T\uparrow$}, 3/4/011/{}, 4/5/001/{$\lambda\downarrow\ T\downarrow$}, 5/6/101/{$\lambda\uparrow\ T\downarrow$}}{
+  \draw[arr,thick] (0,0) -- ({\R*cos(60*\k)},{\R*sin(60*\k)});
+  \node[font=\footnotesize,align=center] at ({(\R+0.9)*cos(60*\k)},{(\R+0.65)*sin(60*\k)}) {$\mathbf V_{\nm}$\ \scriptsize($\bits$)\\[-1pt]\scriptsize \ann};
+}
+\draw[arr,very thick,blue] (0,0) -- ({0.78*\R*cos(20)},{0.78*\R*sin(20)});
+\node[blue,font=\footnotesize] at ({0.78*\R*cos(20)+0.45},{0.78*\R*sin(20)-0.15}) {$\vec{\lambda}_s$};
+\node[draw,circle,fill=white,inner sep=1pt,font=\scriptsize] at (0,0) {$\mathbf V_{0,7}$};
+\end{tikzpicture}}
+\caption{Voltage vectors of the two-level inverter ($S_aS_bS_c$ in brackets) and the six sectors (dashed lines). For the stator flux vector $\vec{\lambda}_s$ in sector $n=1$, the vectors selected by Table~\ref{tab:sw} are shown with the requested change of flux and torque.}
+\label{fig:hex}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\resizebox{0.97\linewidth}{!}{%
+\begin{tikzpicture}
+\node[blk,minimum width=22mm] (pi) at (0,0) {Speed PI\\controller};
+\node[blk,minimum width=26mm,minimum height=13mm] (dtc) at (3.8,0) {DTC controller\\(conventional or\\DTC-SVM)};
+\node[blk,minimum width=22mm] (vsi) at (7.8,0) {Three-phase\\inverter};
+\node[blk,minimum width=20mm] (pm) at (11.1,0) {PMSM};
+\node[blk,minimum width=18mm] (ld) at (14.0,0) {Load};
+\node[blk,minimum width=22mm] (dc) at (7.8,2.2) {DC source\\$V_{dc}$};
+\node[sm] (sw) at (-2.0,0) {};
+\node[lab] (wref) at (-3.0,0) {$\omega^*$};
+\draw[arr] (wref) -- (sw);
+\draw[arr] (sw) -- node[lab,above]{error} (pi);
+\draw[arr] (pi) -- node[lab,above]{$T_e^*$} (dtc);
+\draw[arr] (dtc) -- node[lab,above]{gate signals} (vsi);
+\draw[arr] (vsi) -- node[lab,above]{$v_{abc}$} (pm);
+\draw[<->,thick] (pm) -- (ld);
+\draw[arr] (dc) -- (vsi);
+\draw[arr] (pm.south) -- ++(0,-1.4) -| node[lab,pos=0.25,below]{measured currents $i_{abc}$} (dtc.south);
+\draw[arr] ([xshift=3mm]pm.south) -- ++(0,-2.1) -| node[lab,pos=0.25,below]{measured speed $\omega$} (sw.south);
+\node[lab,right=2pt of sw,yshift=3mm] {$-$};
+\end{tikzpicture}}
+\caption{Block diagram of the PMSM drive with direct torque control.}
+\label{fig:system}
+\end{figure}
+
+\subsection{Flux and Torque Estimation}
+Both schemes use the same voltage-model estimator. The stator flux is obtained in the $\alpha\beta$ frame by integrating the voltage minus the resistive drop; in discrete form, with control period $T_s$,
+\begin{equation}
+\hat\lambda_{\alpha\beta}[k+1] = \hat\lambda_{\alpha\beta}[k] + T_s\big(v_{\alpha\beta}[k] - \hat R_s\, i_{\alpha\beta}[k]\big), \label{eq:est}
+\end{equation}
+and the flux magnitude, flux angle and torque follow as
+\begin{equation}
+\hat\lambda_s=\sqrt{\hat\lambda_\alpha^2+\hat\lambda_\beta^2},\qquad \hat\theta_s=\operatorname{atan2}(\hat\lambda_\beta,\hat\lambda_\alpha),\qquad \hat T_e=\tfrac32 p(\hat\lambda_\alpha i_\beta-\hat\lambda_\beta i_\alpha). \label{eq:estout}
+\end{equation}
+Here $\hat R_s$ is the stator resistance used by the controller, which is equal to $R_s$ in the nominal case. The integrator is initialised with the permanent-magnet flux $\lambda_f$ along the $\alpha$ axis. In the simulation model the sign of the measured currents had to be inverted (this was found by checking the sign of the estimated torque), and this inversion is applied in the estimator.
+
+\subsection{Conventional DTC}
+In conventional DTC (Fig.~\ref{fig:classic}) the flux error $e_\lambda=\lambda^*-\hat\lambda_s$ and the torque error $e_T=T_e^*-\hat T_e$ are processed by hysteresis comparators with bands $H_\lambda$ (two-level) and $H_T$ (three-level):
+\begin{equation}
+d_\lambda=\begin{cases}1,& e_\lambda>H_\lambda\\ 0,& e_\lambda<-H_\lambda\\ d_\lambda^{\text{prev}},& \text{otherwise}\end{cases}\qquad
+d_\tau=\begin{cases}1,& e_T>H_T\\ -1,& e_T<-H_T\\ 0,& \text{otherwise.}\end{cases} \label{eq:hyst}
+\end{equation}
+The sector of the flux vector is $n=\lfloor(\hat\theta_s+30^\circ)/60^\circ\rfloor \bmod 6 + 1$, and the voltage vector is chosen from Table~\ref{tab:sw}; when $d_\tau=0$ a zero vector is applied. The bands used are $H_\lambda=1\%$ of $\lambda^*$ and $H_T=0.02\Nm$. The switching instants are therefore decided by the comparators and the control period, and the switching frequency is not fixed.
+
+\begin{table}[!t]
+\centering
+\caption{Switching table of the conventional DTC (sector $n$, indices modulo 6).}
+\label{tab:sw}
+\singlespacing
+\begin{tabular}{c|cc}
+\toprule
+ & $d_\tau = 1$ & $d_\tau = -1$ \\
+\midrule
+$d_\lambda = 1$ & $\mathbf V_{n+1}$ & $\mathbf V_{n-1}$ \\
+$d_\lambda = 0$ & $\mathbf V_{n+2}$ & $\mathbf V_{n-2}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[!t]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}
+\node[lab] (wr) at (-0.4,4.2) {$\omega^*$};
+\node[sm] (sw) at (0.9,4.2) {};
+\node[blk] (pi) at (3.0,4.2) {Speed\\PI};
+\node[sm] (st) at (5.2,4.2) {};
+\node[blk,minimum width=22mm] (ht) at (7.9,4.2) {Torque\\hysteresis\\(3-level)};
+\node[lab] (lr) at (4.0,2.0) {$\lambda^*$};
+\node[sm] (sl) at (6.4,2.0) {};
+\node[blk,minimum width=22mm] (hl) at (7.9,2.0) {Flux\\hysteresis\\(2-level)};
+\node[blk,minimum width=24mm,minimum height=22mm] (tb) at (11.2,3.1) {Sector\\detection\\+\\switching\\table};
+\node[blk,minimum width=19mm] (vsi) at (14.2,3.1) {Inverter};
+\node[blk,minimum width=17mm] (pm) at (16.6,3.1) {PMSM};
+\node[blk,minimum width=50mm,minimum height=12mm] (es) at (7.5,6.4) {Flux and torque estimator\\$\hat\lambda_s,\ \hat\theta_s,\ \hat T_e$};
+\draw[arr] (wr) -- (sw);
+\draw[arr] (sw) -- (pi);
+\draw[arr] (pi) -- node[lab,above]{$T_e^*$} (st);
+\draw[arr] (st) -- (ht);
+\draw[arr] (lr) -- (sl);
+\draw[arr] (sl) -- (hl);
+\draw[arr] (ht.east) -- ++(0.5,0) |- ([yshift=4mm]tb.west) node[lab,above,pos=0.2] {$d_\tau$};
+\draw[arr] (hl.east) -- ++(0.5,0) |- ([yshift=-4mm]tb.west) node[lab,below,pos=0.2] {$d_\lambda$};
+\draw[arr] (tb) -- node[lab,above]{$S_{abc}$} (vsi);
+\draw[arr] (vsi) -- (pm);
+\draw[arr] ([xshift=-23mm]es.south) -- node[lab,right,pos=0.4]{$\hat T_e$} (st.north);
+\draw[arr] ([xshift=-11mm]es.south) -- node[lab,right,pos=0.3]{$\hat\lambda_s$} (sl.north);
+\draw[arr] (es.east) -| node[lab,above,pos=0.2]{$\hat\theta_s$} (tb.north);
+\draw[arr] (12.8,3.1) |- ([yshift=-4mm]es.east);
+\node[lab] at (13.4,4.7) {$S_{abc},\,V_{dc}$};
+\draw[arr] (pm.north) -- (16.6,7.9) -- (7.5,7.9) -- (es.north);
+\node[lab] at (12.0,8.15) {measured currents $i_{abc}$};
+\draw[arr] (pm.south) -- ++(0,-1.0) -| (sw.south);
+\node[lab] at (8.0,0.55) {measured speed $\omega$};
+\node[lab,right=1pt of sw,yshift=2.5mm] {$-$};
+\end{tikzpicture}}
+\caption{Block diagram of the conventional DTC.}
+\label{fig:classic}
+\end{figure}
+
+\subsection{DTC-SVM}
+In the DTC-SVM implemented here (Fig.~\ref{fig:svm}), which combines DTC with space vector modulation as in \cite{habetler1992,tang2004}, the hysteresis comparators and switching table are replaced by two PI controllers acting in a frame aligned with the estimated stator flux vector (the $M$--$T$ frame). The flux error gives the voltage component along the flux, and the torque error gives the component perpendicular to it:
+\begin{align}
+v_M^* &= K_{p\lambda}\,e_\lambda + K_{i\lambda}\!\int e_\lambda\,dt, \quad e_\lambda = \lambda^* - \hat\lambda_s,\label{eq:pil}\\
+v_T^* &= K_{pT}\,e_T + K_{iT}\!\int e_T\,dt, \quad e_T = T_e^* - \hat T_e.\label{eq:pit}
+\end{align}
+The command is rotated into the stationary frame using the estimated flux angle,
+\begin{equation}
+\begin{bmatrix} v_\alpha^*\\ v_\beta^* \end{bmatrix} = \begin{bmatrix} \cos\hat\theta_s & -\sin\hat\theta_s\\ \sin\hat\theta_s & \cos\hat\theta_s \end{bmatrix}\begin{bmatrix} v_M^*\\ v_T^* \end{bmatrix}, \label{eq:rot}
+\end{equation}
+and an inverse Clarke transform together with a common-mode (min--max) injection gives the phase references
+\begin{align}
+v_a &= v_\alpha^*,\quad v_b = -\tfrac12 v_\alpha^* + \tfrac{\sqrt3}{2}v_\beta^*,\quad v_c = -\tfrac12 v_\alpha^* - \tfrac{\sqrt3}{2}v_\beta^*, \label{eq:invclarke}\\
+v_x^{*} &= v_x - v_0,\quad v_0 = \tfrac12\big(\max(v_a,v_b,v_c) + \min(v_a,v_b,v_c)\big), \quad x\in\{a,b,c\}, \label{eq:minmax}
+\end{align}
+which is an equivalent of space vector modulation; the duty ratio of phase $x$ is $d_x = \tfrac12 + v_x^{*}/V_{dc}$, and the voltage vector stays in the linear range as long as $|\mathbf v^*|\le V_{dc}/\sqrt3$. The references, in volts, are passed to a three-phase PWM generator with a 5~kHz carrier and natural sampling. Each PI output is limited to $\pm V_{dc}/\sqrt3$ and the integrators stop accumulating when the output is limited (conditional integration). The gains used are $K_{p\lambda}=1200$, $K_{i\lambda}=5\times10^{5}$, $K_{pT}=10$ and $K_{iT}=500$ (SI units). The flux estimator (\ref{eq:est}) uses the voltage that is actually applied: it is reconstructed from the gate pulses with (\ref{eq:vab}) and averaged over each control period,
+\begin{equation}
+\bar v_{\alpha\beta}[k] = \frac{1}{N}\sum_{j=1}^{N} v_{\alpha\beta}\big[kN+j\big],\qquad N = T_s/T_{pwm}=10, \label{eq:avg}
+\end{equation}
+where $T_{pwm}=2$~\textmu s is the time resolution of the PWM.
+
+\begin{figure}[!t]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}
+\node[lab] (lr) at (0.2,3.9) {$\lambda^*$};
+\node[lab] (tr) at (0.2,1.5) {$T_e^*$};
+\node[sm] (s1) at (1.5,3.9) {};
+\node[sm] (s2) at (3.0,1.5) {};
+\node[blk] (p1) at (3.7,3.9) {PI\\(flux)};
+\node[blk] (p2) at (5.0,1.5) {PI\\(torque)};
+\node[blk,minimum width=24mm,minimum height=24mm] (rot) at (8.0,2.7) {Rotation\\by $\hat\theta_s$\\($M$--$T$ to\\$\alpha\beta$)};
+\node[blk,minimum width=26mm,minimum height=16mm] (cl) at (11.3,2.7) {Inverse Clarke\\+ min--max\\injection};
+\node[blk,minimum width=20mm,minimum height=16mm] (pwm) at (14.2,2.7) {PWM\\5 kHz};
+\node[blk,minimum width=19mm] (vsi) at (16.6,2.7) {Inverter};
+\node[blk,minimum width=17mm] (pm) at (18.9,2.7) {PMSM};
+\node[blk,minimum width=50mm,minimum height=12mm] (es) at (4.4,-1.2) {Flux and torque estimator\\$\hat\lambda_s,\ \hat\theta_s,\ \hat T_e$};
+\draw[arr] (lr) -- (s1);
+\draw[arr] (tr) -- (s2);
+\draw[arr] (s1) -- (p1);
+\draw[arr] (s2) -- (p2);
+\draw[arr] (p1.east) -- ++(0.6,0) |- node[lab,above,pos=0.2]{$v_M^*$} ([yshift=5mm]rot.west);
+\draw[arr] (p2.east) -- ++(0.6,0) |- node[lab,below,pos=0.2]{$v_T^*$} ([yshift=-5mm]rot.west);
+\draw[arr] (rot) -- node[lab,above]{$v_\alpha^*,v_\beta^*$} (cl);
+\draw[arr] (cl) -- node[lab,above]{$v_{abc}^*$} (pwm);
+\draw[arr] (pwm) -- node[lab,above]{gates} (vsi);
+\draw[arr] (vsi) -- (pm);
+\draw[arr] (es.west) -- (-0.9,-1.2) -- (-0.9,5.0) -- (1.5,5.0) -- (s1.north);
+\node[lab] at (-0.15,5.25) {$\hat\lambda_s$};
+\draw[arr] ([xshift=-14mm]es.north) -- node[lab,right,pos=0.4]{$\hat T_e$} (s2.south);
+\draw[arr] ([xshift=22mm]es.north) -- ++(0,1.3) -| node[lab,above,pos=0.2]{$\hat\theta_s$} (rot.south);
+\draw[arr] (pm.south) -- (18.9,-1.2) -- (es.east);
+\node[lab] at (12.5,-1.5) {measured currents $i_{abc}$};
+\draw[arr] (15.4,2.7) -- (15.4,-0.8) -- ([yshift=4mm]es.east);
+\node[lab] at (12.5,-0.5) {gate pulses, $V_{dc}$ (applied voltage)};
+\node[lab,right=1pt of s1,yshift=2.5mm] {$-$};
+\node[lab,right=1pt of s2,yshift=-2.5mm] {$-$};
+\end{tikzpicture}}
+\caption{Block diagram of the DTC-SVM.}
+\label{fig:svm}
+\end{figure}
+
+\subsection{Simulation Setup}
+Both drives were simulated in MATLAB/Simulink with Simscape Electrical, using a variable-step solver (maximum step 1~\textmu s), an ideal two-level inverter with antiparallel diodes and no dead time, and the motor parameters of Table~\ref{tab:par}. Figure~\ref{fig:simulink} shows the Simulink model of the DTC-SVM drive. Both schemes use the same 20~\textmu s control period and the same outer speed loop. The speed reference is ramped from 0 to $20\rads$ at $700\,\mathrm{rad/s^2}$ from $t=0.05$~s, and the load torque is stepped from $0.5\Nm$ to $2\Nm$ at $t=0.5$~s.
+
+The torque ripple is computed from the torque reconstructed from the measured currents and the rotor angle, $T_e=\tfrac32 p\lambda_f i_q$, and not from the estimate $\hat T_e$. Over a steady-state window of $N$ samples with mean $\bar T$, the RMS ripple and its percentage are
+\begin{equation}
+T_{rip}=\sqrt{\frac1N\sum_{k=1}^{N}\big(T_k-\bar T\big)^2},\qquad T_{rip}\% = 100\,\frac{T_{rip}}{\bar T}, \label{eq:rip}
+\end{equation}
+and the total harmonic distortion of the phase-A current is obtained by FFT over an integer number of electrical cycles, up to 20~kHz,
+\begin{equation}
+\mathrm{THD}=100\,\frac{\sqrt{\sum_{h\neq 1,\ f_h\le 20\,\mathrm{kHz}} I_h^2}}{I_1}. \label{eq:thd}
+\end{equation}
+The average switching frequency is $f_{sw}=N_{tr}/(2T_w)$, where $N_{tr}$ is the number of phase-A transitions in a window of length $T_w$. Two issues found during model development and corrected were: the PWM generator expects its references in volts and not normalised (with a 0.5~V reference the measured duty ratio was 0.51, with 75~V it was 0.75 on the 300~V bus), and, when the commanded voltage was used in the flux estimator, a duty-ratio resolution of 1\% (about 3~V) gave an estimated flux 0.05~Wb above the true flux within 20~ms, which is why the applied voltage (\ref{eq:avg}) is used.
+
+\begin{figure}[!t]
+\centering
+\figgraphic{1.0}{figures/simulink_dtc_svm.png}
+\caption{Simulink/Simscape model of the PMSM drive with DTC-SVM.}
+\label{fig:simulink}
+\end{figure}
+
+\ifextras
+\begin{figure}[!t]
+\centering
+\figgraphic{1.0}{figures/simulink_dtc_classic.png}
+\caption{Simulink/Simscape model of the PMSM drive with conventional DTC.}
+\label{fig:simulinkc}
+\end{figure}
+\fi
+
+\begin{table}[!t]
+\centering
+\caption{Motor and simulation parameters.}
+\label{tab:par}
+\singlespacing
+\begin{tabular}{lcc}
+\toprule
+Parameter & Symbol & Value \\
+\midrule
+Stator resistance & $R_s$ & 2.875~$\Omega$ \\
+$d$- and $q$-axis inductance & $L_d=L_q$ & 8.5~mH \\
+PM flux linkage & $\lambda_f$ & 0.175~Wb \\
+Pole pairs & $p$ & 4 \\
+Inertia, friction & $J,\ B$ & $8\times10^{-4}$~kg$\cdot$m$^2$,\ $10^{-4}$~N$\cdot$m$\cdot$s \\
+DC bus voltage & $V_{dc}$ & 300~V \\
+Flux reference & $\lambda^*$ & 0.175~Wb \\
+Control period & $T_s$ & 20~\textmu s \\
+PWM carrier (DTC-SVM) & $f_{sw}$ & 5~kHz \\
+Hysteresis bands (conventional DTC) & $H_\lambda,\ H_T$ & 1\%, 0.02~N$\cdot$m \\
+Speed PI & $K_p,\ K_i$ & 2, 150 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%% =====================  IV. RESULTS  =====================
+\section{Results and Discussion}
+\subsection{Conventional DTC and DTC-SVM under the Same Test}
+Figure~\ref{fig:dyn} shows torque, speed and flux for the speed ramp and the load step, and Table~\ref{tab:main} lists the metrics, evaluated in the loaded window of $0.7$--$1.0$~s. Both schemes track the speed reference. With $2\Nm$ load, DTC-SVM gives an RMS torque ripple of $0.079\Nm$ ($3.9\%$) against $0.451\Nm$ ($22.5\%$) for conventional DTC, and a peak-to-peak ripple of $0.48\Nm$ against $2.10\Nm$ (Fig.~\ref{fig:zoom}). The flux ripple is $2.2$~mWb against $9.8$~mWb peak-to-peak. The current distortion up to 20~kHz is $4.7\%$ against $26.1\%$\ifextras{} (Fig.~\ref{fig:spec})\fi, and the switching frequency is fixed at 5~kHz for DTC-SVM against about 7.4~kHz (variable) for conventional DTC. The torque rise time to the load step is $1.86$ against $2.52$~ms, while the speed settling time ($41.8$ against $33.2$~ms) and the speed dip at the load step ($0.99$ against $0.72\rads$) are larger for DTC-SVM.
+
+\begin{figure}[!t]
+\centering
+\figgraphic{0.92}{figures/fig_dynamic.png}
+\caption{Torque (from measured currents), speed and estimated stator flux for the speed ramp and the load step at 0.5~s.}
+\label{fig:dyn}
+\end{figure}
+
+\begin{table}[!t]
+\centering
+\caption{Metrics at 20~rad/s, 2~N$\cdot$m load ($T_s=20$~\textmu s).}
+\label{tab:main}
+\singlespacing
+\begin{tabular}{lcc}
+\toprule
+Metric & Conventional DTC & DTC-SVM \\
+\midrule
+Torque ripple, RMS (N$\cdot$m) & 0.451 & 0.079 \\
+Torque ripple, RMS (\%) & 22.5 & 3.9 \\
+Torque ripple, pk--pk (N$\cdot$m) & 2.10 & 0.48 \\
+Flux ripple, pk--pk (mWb) & 9.8 & 2.2 \\
+Current THD to 20~kHz (\%) & 26.1 & 4.7 \\
+Switching frequency (Hz) & 7410 (variable) & 5000 (fixed) \\
+Speed overshoot (\%) & 1.18 & 1.37 \\
+Speed settling, 1\% (ms) & 33.2 & 41.8 \\
+Speed dip at load step (rad/s) & 0.72 & 0.99 \\
+Torque rise, 10--90\% (ms) & 2.52 & 1.86 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[!t]
+\centering
+\figgraphic{0.92}{figures/fig_torque_zoom.png}
+\caption{Torque at 2~N$\cdot$m load (0.80--0.86~s): conventional DTC (top) and DTC-SVM (bottom).}
+\label{fig:zoom}
+\end{figure}
+
+\ifextras
+\begin{figure}[!t]
+\centering
+\figgraphic{0.92}{figures/fig_spectrum.png}
+\caption{Phase-A current spectrum at 2~N$\cdot$m load (0.7--1.0~s).}
+\label{fig:spec}
+\end{figure}
+\fi
+
+\subsection{Speed and Load Sweep}
+To check that the result does not depend on a single operating point, the steady state was evaluated at 10, 30 and $60\rads$ with loads of $0.5$ and $4\Nm$ (Fig.~\ref{fig:sweep}). DTC-SVM has the lower torque ripple at all six points: from $0.036$ to $0.153\Nm$ RMS against $0.437$--$0.461\Nm$ for conventional DTC. The ripple of DTC-SVM increases with speed and load, while that of conventional DTC stays almost constant; this increase has not been investigated yet. The current distortion is lower for DTC-SVM at every point, and the highest distortion values for both schemes occur at the $0.5\Nm$ load.
+
+\begin{figure}[!t]
+\centering
+\figgraphic{0.97}{figures/fig_sweep.png}
+\caption{Steady-state torque ripple and current THD over six operating points (speed in rad/s / load in N$\cdot$m).}
+\label{fig:sweep}
+\end{figure}
+
+\subsection{Effect of an Incorrect Stator Resistance}
+The stator resistance varies with temperature and frequency \cite{haque2000,kadjoudj2007}, while the controller uses a fixed value $\hat R_s$. To examine this, the motor keeps its true $R_s$ and the estimator uses $\hat R_s = k R_s$. In this study the control is considered \emph{lost} when, in the evaluation window, the true flux (computed from the measured currents) falls below $0.5\lambda_f$, or the mean speed differs from the reference by more than 20\%; these two thresholds are the criterion used in this work.
+
+With the correct value ($k=1$), both schemes worked at 20, 5 and $2\rads$ and through a speed reversal from $+5$ to $-5\rads$; at low speed DTC-SVM gave $0.033$--$0.037\Nm$ RMS ripple against $0.443$--$0.445\Nm$ for conventional DTC, and neither scheme lost control during the reversal. With $k\ne1$ the results are given in Table~\ref{tab:rs} and Figs.~\ref{fig:rsmap} and~\ref{fig:rsflux}. At $20\rads$, $k=0.7$ to $0.9$ gives a stable drive whose true flux settles at $0.147$--$0.168\Wb$ while the estimated flux remains at $0.175\Wb$\ifextras{} (Fig.~\ref{fig:rsest})\fi; $k\ge1.05$ gives lost control. At $5\rads$, control is lost for every $k\ne1$ that was tested, including $k=0.9$, and the time at which the flux error first exceeds $0.05\Wb$ becomes shorter as $|k-1|$ grows. Both schemes use the same flux estimator, and they fail in the same cases and at nearly the same time (within a few milliseconds).
+
+\begin{table}[!t]
+\centering
+\caption{Outcome versus assumed $R_s$ (true flux in Wb, ideal 0.175; identical outcome for both schemes). ``Lost'': control lost according to the criterion above.}
+\label{tab:rs}
+\singlespacing
+\begin{tabular}{ccc}
+\toprule
+Assumed $R_s$ ($kR_s$) & $20\rads$ & $5\rads$ \\
+\midrule
+$k = 0.7 / 0.8 / 0.9$ & 0.147 / 0.160 / 0.168 & lost \\
+$k = 1$ & 0.175 & 0.175 \\
+$k = 1.05 / 1.1 / 1.2 / 1.3$ & lost & lost \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[!t]
+\centering
+\figgraphic{0.97}{figures/fig_rs_map.png}
+\caption{Stability map for the stator resistance test: true flux (Wb) where control was kept (green) and ``lost'' where it was lost (red), for each speed and assumed $R_s$. The two schemes gave the same outcome in every cell.}
+\label{fig:rsmap}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\figgraphic{0.97}{figures/fig_rs_flux.png}
+\caption{True flux versus the $R_s$ assumed by the estimator. Circles: control kept; crosses: control lost (plotted at most 0.6~Wb). The two schemes overlap.}
+\label{fig:rsflux}
+\end{figure}
+
+\ifextras
+\begin{figure}[!t]
+\centering
+\figgraphic{0.92}{figures/fig_rs_estimated_true.png}
+\caption{Estimated and true flux for DTC-SVM at $20\rads$ with $k=0.7$, $1$ and $1.3$.}
+\label{fig:rsest}
+\end{figure}
+\fi
+
+Since $\hat\lambda=\int(v-\hat R_s i)\,dt$ while the true flux is $\lambda=\int(v-R_s i)\,dt$, the estimation error $e=\lambda-\hat\lambda$ satisfies $\dot e=\Delta R\, i$ with $\Delta R=\hat R_s-R_s$. For a surface-mounted machine $i=(\lambda-\lambda_{pm})/L_s$, where $\lambda_{pm}$ is the permanent-magnet flux vector, so that
+\begin{equation}
+\dot e = \frac{\Delta R}{L_s}\,e + \frac{\Delta R}{L_s}\big(\hat\lambda-\lambda_{pm}\big). \label{eq:err}
+\end{equation}
+The sign of the coefficient $\Delta R/L_s$ changes with the sign of $k-1$, and this is consistent with the different behaviour for $k>1$ and $k<1$ at $20\rads$. However, the growth rates of the flux error measured in the simulations differ from $\Delta R/L_s$ by factors between 0.4 and 2.7 and are not monotonic in $k$, so (\ref{eq:err}) does not by itself explain the results quantitatively, and the cause of the loss of control has not been established.
+
+%% =====================  V. CONCLUSION  =====================
+\section{Conclusion}
+Simulation models of a PMSM drive with conventional DTC and with DTC-SVM were built and tested at the same control period. For the test conditions used, DTC-SVM gave a lower torque ripple at all operating points (by a factor of about 6 at $20\rads$ and $2\Nm$, and 3 to 12 over the points tested), a lower flux ripple, a lower current distortion (4.7\% against 26.1\% at $20\rads$ and $2\Nm$) and a fixed switching frequency, while its speed settling time and load-step dip were larger. With an incorrect stator resistance in the flux estimator, both schemes lost control for $k\ge1.05$ at $20\rads$ and for every $k\ne1$ tested at $5\rads$; they behaved in the same way, and the cause has not been established.
+
+No significant new approach has been identified so far. The results obtained are a set of working models, a defined set of tests, and a measured sensitivity to stator resistance error that can serve as a reference for further work on DTC of PMSM drives.
+
+%% =====================  VI. FUTURE WORK  =====================
+\section{Future Work}
+\begin{enumerate}
+\item Review the literature on stator-resistance-tolerant flux estimation (online resistance estimation, closed-loop and hybrid observers) and other DTC schemes, to select directions to examine on the present platform.
+\item Examine the cause of the loss of control with a wrong stator resistance, and resolve the low-speed boundary more finely.
+\item Examine the increase of the DTC-SVM torque ripple with speed and load.
+\item Test the effect of current-sensor offsets and inverter dead time.
+\end{enumerate}
+
+%% =====================  REFERENCES  =====================
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+\end{document}

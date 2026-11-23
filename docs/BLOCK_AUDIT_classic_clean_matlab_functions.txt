@@ -1,0 +1,172 @@
+===== classic_dtc_winder_clean/Controller/MATLAB Function =====
+function [v_alpha, v_beta] = calculate_voltages(Sa, Sb, Sc, Vdc)
+% Calculate alpha-beta voltages based on switching states and DC link
+v_alpha = (2/3) * Vdc * (Sa - 0.5 * (Sb + Sc));
+v_beta  = (2/3) * Vdc * (sqrt(3)/2) * (Sb - Sc);
+end
+
+%{
+Inputs: Sa, Sb, Sc (the switching state chosen last cycle), Vdc
+Outputs: v_alpha, v_beta
+
+This answers: given the switch positions I already commanded, what voltage is actually sitting on the motor terminals right now? 
+It doesn't measure anything — it's a pure calculation from Part 3.2's formula, because a 2-level inverter's output voltage is fully determined by which switches are on. 
+This is one of the things that makes DTC elegant: you never need a voltage sensor, just knowledge of your own last command plus Vdc.
+
+This feeds straight into the estimator, because the estimator needs to know "how much voltage pushed the flux where it is now."
+%}
+
+===== classic_dtc_winder_clean/Controller/MATLAB Function1 =====
+function [Sa, Sb, Sc] = dtc_switching_table(lambda_s_mag, theta_s_deg, Te_est, ...
+    lambda_ref, Te_ref, HB_lambda, HB_torque)
+%#codegen
+% DTC hysteresis comparators + switching table (Parts 4.4-4.6)
+% Outputs the 3-phase switching state (Sa,Sb,Sc) each in {0,1}
+% Feed this into a Simulink "Controlled Voltage Source" / averaged VSI
+% block, or directly into a full switched IGBT bridge if you're doing
+% detailed power-electronics simulation.
+
+persistent d_lambda d_torque
+if isempty(d_lambda)
+    d_lambda = 1;   % start assuming flux needs to rise
+    d_torque = 0;
+end
+
+%% --- Flux hysteresis comparator (2-level, Part 4.4) ---
+flux_err = lambda_ref - lambda_s_mag;
+if flux_err > HB_lambda
+    d_lambda = 1;
+elseif flux_err < -HB_lambda
+    d_lambda = 0;
+end
+% else: hold previous value (hysteresis behavior)
+
+%% --- Torque hysteresis comparator (3-level, Part 4.4) ---
+torque_err = Te_ref - Te_est;
+if torque_err > HB_torque
+    d_torque = 1;
+elseif torque_err < -HB_torque
+    d_torque = -1;
+else
+    d_torque = 0;
+end
+
+%% --- Sector identification (Step 1 from the sector clarification) ---
+theta = mod(theta_s_deg, 360);
+if theta >= 330 || theta < 30
+    n = 1;
+elseif theta < 90
+    n = 2;
+elseif theta < 150
+    n = 3;
+elseif theta < 210
+    n = 4;
+elseif theta < 270
+    n = 5;
+else
+    n = 6;
+end
+
+%% --- Vector selection rule (Step 2 from the sector clarification) ---
+% Vector index wraps mod 6, mapped to 1-6 (no zero index)
+wrap6 = @(k) mod(k-1,6) + 1;
+
+if d_torque == 0
+    vec_idx = 0;   % zero vector (alternate V0/V7 for switching loss balance)
+elseif d_lambda == 1 && d_torque == 1
+    vec_idx = wrap6(n+1);
+elseif d_lambda == 1 && d_torque == -1
+    vec_idx = wrap6(n-1);
+elseif d_lambda == 0 && d_torque == 1
+    vec_idx = wrap6(n+2);
+else % d_lambda == 0 && d_torque == -1
+    vec_idx = wrap6(n-2);
+end
+
+%% --- Map vector index to switching state (Part 3.2 table) ---
+switch vec_idx
+    case 0
+        Sa = 0; Sb = 0; Sc = 0;     % V0 (use V7=[1 1 1] on alternating cycles)
+    case 1
+        Sa = 1; Sb = 0; Sc = 0;     % V1
+    case 2
+        Sa = 1; Sb = 1; Sc = 0;     % V2
+    case 3
+        Sa = 0; Sb = 1; Sc = 0;     % V3
+    case 4
+        Sa = 0; Sb = 1; Sc = 1;     % V4
+    case 5
+        Sa = 0; Sb = 0; Sc = 1;     % V5
+    case 6
+        Sa = 1; Sb = 0; Sc = 1;     % V6
+    otherwise
+        % Should be unreachable given vec_idx is always 0-6, but
+        % MATLAB Coder requires every output defined on every path.
+        Sa = 0; Sb = 0; Sc = 0;
+end
+
+end
+
+===== classic_dtc_winder_clean/Controller/dtc_estimator =====
+function [lambda_s_mag, theta_s_deg, Te_est, lambda_alpha, lambda_beta, i_beta] = dtc_estimator(ia, ib, ic, v_alpha, v_beta, Rs, p, Ts)
+%#codegen
+% DTC flux and torque estimator (voltage model, Part 4.3)
+% Implements this as a MATLAB Function block with two persistent
+% integrator states (lambda_alpha, lambda_beta).
+%
+% Inputs:
+%   ia, ib, ic      - measured phase currents [A]
+%   v_alpha, v_beta - inverter output voltage in alpha-beta frame [V]
+%                     (computed upstream from the switching state, Part 3.2)
+%   Rs              - stator resistance [ohm]
+%   p               - pole pairs
+%   Ts              - sample time [s]
+%
+% Outputs:
+%   lambda_s_mag - stator flux magnitude [Wb]
+%   theta_s_deg  - stator flux angle [deg], wrapped to [0,360)
+%   Te_est       - estimated electromagnetic torque [N*m]
+%   lambda_alpha, lambda_beta - flux components, useful for scope/debug
+
+%{
+This is the block that answers the two questions torque control actually depends on: how big is my stator flux, and what angle is it 
+at relative to where it started — recall from Part 4.2, torque depends on the angle between stator flux and rotor flux, 
+and this angle is embedded in how theta_s_deg evolves over time.
+%}
+
+
+persistent lam_a lam_b
+if isempty(lam_a)
+    lam_a = 0.175;
+    lam_b = 0;
+end
+%% Correct physical current inversion from the sensors
+ia_true = -ia;
+ib_true = -ib;
+
+%% Clarke transform of true currents
+i_alpha = ia_true;
+i_beta  = (1/sqrt(3))*ia_true + (2/sqrt(3))*ib_true;
+
+%% Flux integration (Part 4.3) — forward Euler, simplest form
+% NOTE: pure integration drifts at low speed (Problem 3, Part 5.1).
+% Once this base version works, replace with a low-pass-filter-based
+% or closed-loop observer estimator and compare.
+lam_a = lam_a + Ts * (v_alpha - Rs*i_alpha);
+lam_b = lam_b + Ts * (v_beta  - Rs*i_beta);
+
+
+lambda_alpha = lam_a;
+lambda_beta  = lam_b;
+
+%% Magnitude and angle
+lambda_s_mag = sqrt(lam_a^2 + lam_b^2);
+theta_s_rad  = atan2(lam_b, lam_a);
+theta_s_deg  = mod(theta_s_rad * 180/pi, 360);
+
+%% Torque estimate (Part 4.3)
+Te_est = 1.5 * p * (lam_a*i_beta - lam_b*i_alpha);
+
+end
+
+

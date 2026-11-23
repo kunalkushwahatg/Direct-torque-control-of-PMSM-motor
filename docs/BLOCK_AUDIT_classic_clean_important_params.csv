@@ -1,0 +1,156 @@
+﻿Area,Block / constant,Parameter,Value,Why it matters
+Model,Solver,Solver,VariableStepAuto,Automatic variable-step solver; Simscape network solves implicitly
+Model,Solver,StopTime,Tsim (20 s default; 2 s matrix),Simulation duration
+Model,Solver,MaxStep,1e-6 s (5e-6 s matrix),Largest solver step; main speed/accuracy knob
+Model,Solver,RelTol,1e-3,Relative solver tolerance
+Top level,Constant1,Value,Vdc = 300 V,DC link for voltage reconstruction and DC source
+Top level,Constant7,Value,Rs*Rs_factor = 2.875 ohm,Estimator stator resistance; factor 1 = no mismatch
+Top level,Constant8,Value,p = 4,Pole pairs in torque estimate
+Top level,Constant9,Value,Ts_dtc = 20 us,DTC/estimator/PID sample time
+Top level,Constant11,Value,HB_lambda = 1.75 mWb,Flux hysteresis band
+Top level,Constant12,Value,HB_torque = 0.02 N.m,Torque hysteresis band
+Top level,Constant13,Value,lambda_ref = 0.175 Wb,Stator flux reference
+Top level,filt_on,Value,1,"1 = filtered tension feedback, 0 = raw"
+Top level,filt_sel,Criteria/Threshold,u2 > 0.5,Selects filtered path when filt_on > 0.5
+Top level,lpf_gain,Gain,1/tau_F = 12.566 rad/s,First-order tension filter bandwidth
+Top level,lpf_int,InitialCondition,F0 = 15 N,Initial filtered tension
+Top level,lpf_sum,Inputs,F - F_filt,Filter error input
+Controller,PID Controller,Controller/Form/TimeDomain,PI / Parallel / Discrete-time,"Speed loop is PI, discrete"
+Controller,PID Controller,SampleTime,Ts_dtc = 20 us,Matches DTC sample
+Controller,PID Controller,IntegratorMethod,Forward Euler,Discrete integrator
+Controller,PID Controller,P,Kp_speed = 2.0,Torque per rad/s of speed error
+Controller,PID Controller,I,Ki_speed = 150,Torque per rad/s.s of speed error
+Controller,PID Controller,D/N,0 / 100,No derivative; N inactive
+Controller,PID Controller,Limits,+/-5 N.m,Torque command saturation
+Controller,PID Controller,AntiWindupMode,"clamping, Kb=1",Integrator stops at saturation
+Controller,Sum,Inputs,+ -,Speed error = omega_ref - omega
+Controller,omega_ref_ramp,Slew limits,+/-700 rad/s^2,Active speed-reference rate limit
+Controller,omega_ref,Step,0.05 s; 0 -> 20 rad/s,Legacy speed step; not active in winder loop
+Controller,omega_rev,Step,1e9 s; 0 -> -40 rad/s,Legacy reversal; disabled
+Controller,ref_sum,Inputs,+ +,Legacy sum -> Out13 (unconnected)
+Controller,Unit Delay1/2/3,IC/Sample,0 / Ts_dtc,Hold last gate state for voltage reconstruction
+Controller,Logical Operator/1/2,Operator,NOT,Complementary lower-switch gates
+Controller,Data Type Conversion,OutDataTypeStr,double,Boolean gates to double
+Feedforward,FF_Mux,Expr,Tff_extra = mode*F_ref*r + B*omega_ref,Tension load + friction feedforward
+Feedforward,FF_Mux3a,Expr,rdot = mode*h*v_line/(2*pi*r),Radius rate
+Feedforward,FF_Mux4b,Expr,wdot = (dv/dt)/r - omega_ref*rdot/r^2,Angular acceleration
+Feedforward,Jwdot,Expr,J*wdot,Inertia torque
+Feedforward,dJdr,Expr,dJ/dr,Variable roll inertia derivative
+Feedforward,dJw,Expr,dJdr*rdot*omega_ref,Inertia-change torque
+Feedforward,T_inertia,Inputs,+ +,Jwdot + dJw
+Feedforward,ff_full_c,Value,0 saved / 1 matrix,0 = inertia only; 1 = full feedforward
+Feedforward,ff_on,Value,1,Feedforward enable
+Feedforward,Te_sat,Limits,+/-Tmax = +/-5 N.m,Torque command clamp
+Feedforward,v_tau_ff,Gain,1/T_ramp = 2.5 saved / 1.0 matrix,S-curve time scale
+Feedforward,v_scurve_d,Expr,v_line_set*(6u-6u^2)/T_ramp,S-curve acceleration
+Line_Reference,v_tau,Gain,1/T_ramp = 2.5 saved / 1.0 matrix,Normalized S-curve time
+Line_Reference,v_tau_sat,Limits,0 to 1,Clamp normalized time
+Line_Reference,v_scurve,Expr,v_line_set*(3u^2-2u^3),S-curve line speed
+Line_Reference,v_sat,Limits,0 to 1.2 m/s,Line-speed clamp
+Line_Reference,F_ref_set,Value,15 N,Tension reference
+Line_Reference,winder_mode,Value,winder_mode_set = +/-1,Winding/unwinding direction
+Tension Control,eF,Inputs,+ -,Fref - F_filtered
+Tension Control,PI_F,Controller/Form/TimeDomain,PI / Parallel / Continuous-time,Continuous tension PI
+Tension Control,PI_F,P,Kp_F = 4.4e-4 rad/s per N,Tension proportional gain
+Tension Control,PI_F,I,Ki_F = 8.9e-4 rad/s per N.s,Tension integral gain
+Tension Control,PI_F,Limits,+/-draw_max = +/-0.2 rad/s,Tension trim saturation
+Tension Control,PI_F,AntiWindupMode,"clamping, Kb=1",Integrator stops at limit
+Tension Control,inv_Fslack,Gain,1/F_slack = 2,Slack normalization
+Tension Control,one_minus,Inputs,+ -,1 - F/F_slack
+Tension Control,slack_sat,Limits,0 to 1,Only positive slack correction
+Tension Control,takeup_gain,Gain,draw_takeup = 0.02 rad/s,Slack take-up speed
+Tension Control,draw_total,Inputs,+ +,PI trim + take-up
+Tension Control,mode_draw,Inputs,"2, element-wise",Sign flip for unwinding
+Tension Control,w_ff,Inputs,* /,vline/r
+Tension Control,w_ref,Inputs,+ +,w_ff + mode*draw
+Tension Control,w_lim,Limits,0 to 60 rad/s,Speed-reference clamp
+Plant electrical,PMSM1,Parameterization,"Constant, flux-linkage PM, wye",Electrical model selection
+Plant electrical,PMSM1,p,4,Pole pairs
+Plant electrical,PMSM1,lambda_f,0.175 Wb,PM flux linkage; kt = 1.05 N.m/A
+Plant electrical,PMSM1,Ld/Lq,8.5 mH / 8.5 mH,Surface PMSM inductances
+Plant electrical,PMSM1,L0,0.16 mH,Zero-sequence inductance
+Plant electrical,PMSM1,Rs,2.875 ohm,Stator resistance
+Plant electrical,PMSM1,J/lam,0 / 0,PMSM has no mechanical inertia/damping; plant owns them
+Plant electrical,PMSM1,Loss/thermal,none / off,No iron-loss or thermal network
+Plant electrical,Converter,Fidelity/device,Detailed / ideal switches,Switched 2-level VSI
+Plant electrical,Converter,Ron/Vf/Vth/Ih/Goff,1 mohm / 0.8 V / 0.5 V / 1 A / 1 uS,Conduction data
+Plant electrical,Converter,Eon/Eoff/Voff/Iout,22.86 mJ / 17.14 mJ / 300 V / 600 A,"Loss-model data, not ratings"
+Plant electrical,Converter,Diode,"No dynamics; Vf=0.8, Ron=1 mohm, Goff=10 uS",Protection diode model
+Plant electrical,Converter,Snubber,"Excluded; Rs=0.1 ohm, Cs=1e-7 F",Snubber inactive
+Plant electrical,DC Voltage Source,v0,300 V,DC bus
+Plant electrical,Six-Pulse Gate Multiplexer,port_option,PS,Combines six gate signals
+Plant electrical,Speed Source,Type,Ideal angular velocity,Imposes plant speed on PMSM
+Plant electrical,Torque Sensor,Type,Ideal,Measures shaft torque
+Plant electrical,Solver Configuration,Local solver,NE_BACKWARD_EULER_ADVANCER / ODE1 / 1 ms,Simscape network solver; not Simulink solver
+Winder Plant,Jc,Value,0.005 kg.m^2,Core/shaft inertia
+Winder Plant,Jm,Value,0.0008 kg.m^2,Motor inertia
+Winder Plant,rc2,Value,0.0025 m^2,Core radius squared
+Winder Plant,m,Gain,rho*web_w*pi = 753.982,Roll mass scale
+Winder Plant,half_m,Gain,0.5,Half-mass factor
+Winder Plant,Jroll_core,Expr,0.5*m*(r^2+rc^2),Roll inertia
+Winder Plant,Jroll,Expr,Jc + Jroll_core,Core + roll inertia
+Winder Plant,J,Expr,Jm + Jroll,Total inertia
+Winder Plant,TL,Expr,mode*F*r,Load torque
+Winder Plant,dHdt,Inputs,+ - -,Te - TL - B*omega
+Winder Plant,Bw,Gain,B = 1e-4,Viscous damping
+Winder Plant,Int_H,IC/limits,H0 / none,Momentum state
+Winder Plant,omega,Expr,H/J,Speed
+Winder Plant,num_dr,Expr,mode*vline,Radius rate numerator
+Winder Plant,h_gain,Gain,h = 5e-4 m,Web thickness
+Winder Plant,den_dr,Gain,2*pi,Radius rate denominator
+Winder Plant,drdt,Expr,mode*h*vline/(2*pi*r),Radius rate
+Winder Plant,Int_r,IC/limits,r0 / 0.05 to 0.12 m,Radius state
+Winder Plant,vsurf,Expr,omega*r,Web surface speed
+Winder Plant,dv,Inputs,+ -,vsurf - vline
+Winder Plant,dxdt,Expr,mode*(vsurf - vline),Web stretch rate
+Winder Plant,Int_x,IC/limits,F0/K_web = 5e-5 / 0 to 6.667e-4 m,Web stretch state
+Winder Plant,K_x,Gain,K_web = 3e5 N/m,Web stiffness
+Winder Plant,C_d,Gain,C_web = 500 N.s/m,Web damping
+Winder Plant,F_sum,Expr,K_web*x + C_web*dxdt,Tension
+Winder Plant,F_sat,Limits,0 to 200 N,Tension clamp
+Parameter/runtime,pmsm_dtc_parameters.m,Rs,2.875 ohm,Stator resistance
+Parameter/runtime,pmsm_dtc_parameters.m,Ld/Lq,8.5 mH / 8.5 mH,Inductances
+Parameter/runtime,pmsm_dtc_parameters.m,lambda_f,0.175 Wb,PM flux
+Parameter/runtime,pmsm_dtc_parameters.m,p,4,Pole pairs
+Parameter/runtime,pmsm_dtc_parameters.m,J,0.0008 kg.m^2,Legacy; PMSM block J=0
+Parameter/runtime,pmsm_dtc_parameters.m,B,0.0001 N.m.s,Overwritten by winder.Bm (same value)
+Parameter/runtime,pmsm_dtc_parameters.m,Vdc,300 V,DC bus
+Parameter/runtime,pmsm_dtc_parameters.m,Ts_dtc,20 us,Controller sample
+Parameter/runtime,pmsm_dtc_parameters.m,Ts_pwm,2 us,SVM only; unused by classical DTC
+Parameter/runtime,pmsm_dtc_parameters.m,lambda_ref,0.175 Wb,Flux reference
+Parameter/runtime,pmsm_dtc_parameters.m,HB_lambda,1.75 mWb,Flux band
+Parameter/runtime,pmsm_dtc_parameters.m,HB_torque,0.02 N.m,Torque band
+Parameter/runtime,pmsm_dtc_parameters.m,Kp_speed/Ki_speed,2 / 150,Speed PI gains
+Parameter/runtime,pmsm_dtc_parameters.m,w_ref,20 rad/s,Legacy speed step
+Parameter/runtime,pmsm_dtc_parameters.m,TL_init/TL/t_load,0.5 / 2.0 / 0.5,Legacy load step; unused
+Parameter/runtime,pmsm_dtc_parameters.m,Tsim,1 s,Overridden to 20 or 2 s
+Parameter/runtime,pmsm_dtc_parameters.m,Rs_factor,1.0,No Rs mismatch
+Parameter/runtime,pmsm_dtc_parameters.m,t_rev,1e9 s,Legacy reversal disabled
+Parameter/runtime,winder_params.m,rho/w/h/E/L,800 / 0.30 / 0.0005 / 2e9 / 1.0,Web material and geometry
+Parameter/runtime,winder_params.m,A,1.5e-4 m^2,Web cross-section
+Parameter/runtime,winder_params.m,rc/rmax,0.05 / 0.12 m,Core/max radius
+Parameter/runtime,winder_params.m,r0_wind/r0_unwind,0.06 / 0.115 m,Initial radii
+Parameter/runtime,winder_params.m,Jc/Jm/Bm,0.005 / 0.0008 / 0.0001,Inertia and damping
+Parameter/runtime,winder_params.m,F_ref/F0/Fmax/Tmax,15 / 15 / 200 / 5,Tension and torque limits
+Parameter/runtime,winder_params.m,v_init/v_slope/v_max,0.2 / 0.9 / 2.0,Standalone ramp only
+Parameter/runtime,winder_params.m,v_line_set,1.2 m/s,Winder line speed
+Parameter/runtime,winder_params.m,T_ramp,0.4 s saved / 1.0 s runtime,S-curve duration
+Parameter/runtime,winder_params.m,f_c/tau_F,2 Hz / 79.6 ms,Tension filter
+Parameter/runtime,winder_params.m,filt_on,1,Filter enabled
+Parameter/runtime,winder_params.m,C_web,500 N.s/m,Web damping
+Parameter/runtime,winder_params.m,ff_on/ff_full,1 / 0 saved; 1 runtime,Feedforward enable/mode
+Parameter/runtime,winder_params.m,Kp_draw/Ki_draw,1e-3 / 2e-2,Standalone validation only
+Parameter/runtime,winder_params.m,draw_max,0.2 rad/s (0.5 overwritten),Tension trim limit
+Parameter/runtime,winder_params.m,Kp_F/Ki_F,4.4e-4 / 8.9e-4,Tension PI gains
+Parameter/runtime,winder_params.m,draw_takeup/F_slack,0.02 / 0.5,Slack take-up
+Parameter/runtime,winder_params.m,w_min/w_max,0 / 60 rad/s,Speed clamp
+Parameter/runtime,winder_params.m,Ts/Tsim,20 us / 20 s,Sample and default stop time
+Parameter/runtime,winder_params.m,K_web,3e5 N/m,Derived E*A/L
+Parameter/runtime,winder_params.m,winder_p,packed vector,Standalone S-function only
+Parameter/runtime,run_case_2s.m,winder_mode_set,+1/-1,Direction
+Parameter/runtime,run_case_2s.m,r0,0.06/0.115 m,Initial radius
+Parameter/runtime,run_case_2s.m,H0/F0,0 / 15 N,Initial momentum/tension
+Parameter/runtime,run_case_2s.m,Tsim/T_ramp,2 s / 1.0 s,Matrix run length/ramp
+Parameter/runtime,run_case_2s.m,ff_on/ff_full,case / 1,Feedforward gate/full mode
+Parameter/runtime,run_case_2s.m,filt_on,1,Filtered tension
+Parameter/runtime,run_case_2s.m,MaxStep,5e-6 s,Runtime step limit
