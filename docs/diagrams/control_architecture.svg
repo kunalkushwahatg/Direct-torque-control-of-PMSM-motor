@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="900" viewBox="0 0 1000 900">
+  <rect width="1000" height="900" fill="#ffffff"/>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#111111"/>
+    </marker>
+  </defs>
+
+  <g font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#111111">
+    <!-- boxes -->
+    <g fill="#ffffff" stroke="#111111" stroke-width="1.5">
+      <rect x="350" y="40" width="300" height="70"/>
+      <rect x="350" y="160" width="300" height="70"/>
+      <rect x="350" y="300" width="300" height="70"/>
+      <rect x="350" y="420" width="300" height="70"/>
+      <rect x="350" y="540" width="300" height="70"/>
+      <rect x="350" y="660" width="300" height="70"/>
+      <rect x="350" y="780" width="300" height="80"/>
+      <rect x="30" y="300" width="240" height="80"/>
+    </g>
+
+    <!-- labels -->
+    <text x="500" y="69" text-anchor="middle">Line-speed reference</text>
+    <text x="500" y="189" text-anchor="middle">Tension PI</text>
+    <text x="500" y="329" text-anchor="middle">Speed PI</text>
+    <text x="500" y="449" text-anchor="middle">DTC / SVM-DTC</text>
+    <text x="500" y="569" text-anchor="middle">Inverter</text>
+    <text x="500" y="689" text-anchor="middle">PMSM</text>
+    <text x="500" y="814" text-anchor="middle">Winder / unwinder plant</text>
+    <text x="150" y="329" text-anchor="middle" font-size="15">Radius + inertia +</text>
+    <text x="150" y="350" text-anchor="middle" font-size="15">tension feedforward</text>
+
+    <!-- main signal flow -->
+    <g stroke="#111111" stroke-width="1.5" fill="none">
+      <line x1="500" y1="110" x2="500" y2="155" marker-end="url(#arrow)"/>
+      <line x1="500" y1="230" x2="500" y2="295" marker-end="url(#arrow)"/>
+      <line x1="500" y1="370" x2="500" y2="415" marker-end="url(#arrow)"/>
+      <line x1="500" y1="490" x2="500" y2="535" marker-end="url(#arrow)"/>
+      <line x1="500" y1="610" x2="500" y2="655" marker-end="url(#arrow)"/>
+      <line x1="500" y1="730" x2="500" y2="775" marker-end="url(#arrow)"/>
+      <line x1="270" y1="340" x2="345" y2="340" marker-end="url(#arrow)"/>
+    </g>
+
+    <!-- feedback -->
+    <path d="M 650 820 H 860 V 195 H 655" fill="none" stroke="#111111" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="755" y="185" text-anchor="middle" font-size="14">Tension feedback</text>
+
+    <!-- small annotation -->
+    <text x="500" y="268" text-anchor="middle" font-size="13" fill="#333333">speed reference</text>
+  </g>
+</svg>

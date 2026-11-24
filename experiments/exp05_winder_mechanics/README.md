@@ -59,48 +59,9 @@ Both use the same voltage-model stator-flux estimator (λ ≈ 0.175 Wb), the sam
 
 ## 3. How the pieces fit
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Helvetica, Arial, sans-serif'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 28, 'rankSpacing': 35}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1px !important; }'}}%%
-flowchart TB
-    subgraph REF["Reference"]
-        L["Line-speed reference<br/>S-curve to 1.2 m/s"]
-        MODE["Mode<br/>+1 wind / -1 unwind"]
-    end
-
-    subgraph LOOP["Tension and speed loops"]
-        PI["Tension PI<br/>F_ref - F -> draw"]
-        FF["Feedforward<br/>speed + torque + friction"]
-        SUM(("+"))
-        W["Speed reference"]
-        SP["Speed PI"]
-    end
-
-    subgraph DRIVE["PMSM drive"]
-        D["Classical DTC<br/>or SVM-DTC"]
-        M["PMSM + inverter"]
-    end
-
-    subgraph PLANT["Winder plant"]
-        R["Roll + web<br/>r, J, F, omega"]
-        FB["Tension feedback<br/>2 Hz low-pass"]
-    end
-
-    L --> PI
-    L --> FF
-    MODE -.-> PI
-    MODE -.-> FF
-    PI --> SUM
-    FF --> SUM
-    SUM --> W
-    W --> SP
-    SP --> D
-    D -->|"T_e"| M
-    M --> R
-    R -->|"F"| FB
-    FB -->|"F"| PI
-    R -. "r, J, omega" .-> FF
-
-```
+<p align="center">
+  <img src="../../docs/diagrams/control_architecture.svg" width="78%" alt="Winder control architecture: tension loop, speed loop, PMSM drive and winder plant">
+</p>
 
 Read it as three layers:
 

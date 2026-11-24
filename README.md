@@ -25,22 +25,9 @@ Two drive-level torque-control schemes are compared on **the same mechanical pla
 | **Classical DTC** | Hysteresis comparators + switching table | Variable switching frequency |
 | **SVM-DTC** | Flux PI + torque PI + rotation + inverse Clarke | Fixed-frequency PWM (5 kHz) |
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Helvetica, Arial, sans-serif'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 28, 'rankSpacing': 35}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1px !important; }'}}%%
-flowchart TB
-    L["Line-speed reference"] --> TPI["Tension PI"]
-    FB["Tension feedback"] --> TPI
-    TPI --> WREF["Speed reference"]
-    FF["Radius + inertia + tension feedforward"] --> WREF
-    WREF --> SPD["Speed PI"]
-    SPD --> DTC["DTC / SVM-DTC"]
-    DTC --> INV["Inverter"]
-    INV --> PMSM["PMSM"]
-    PMSM --> WIND["Winder / unwinder plant"]
-    WIND --> FB
-    WIND -. "radius, inertia" .-> FF
-
-```
+<p align="center">
+  <img src="docs/diagrams/control_architecture.svg" width="72%" alt="Control architecture: tension loop, speed loop, PMSM drive and winder plant">
+</p>
 
 The project covers:
 
