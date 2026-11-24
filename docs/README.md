@@ -6,16 +6,9 @@ debugging context, or model details.
 
 ## How the documents fit together
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Arial, Helvetica, sans-serif', 'fontSize': '18px'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 40, 'rankSpacing': 50, 'padding': 12}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1.5px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1.5px !important; } .nodeLabel { font-size: 18px !important; } .edgeLabel { font-size: 16px !important; }'}}%%
-flowchart TB
-    RB["RUNBOOK"] --> EX["Experiments"]
-    EX --> RES["Results"]
-    RES --> REP["Report"]
-    CL["CHANGELOG"] -.-> FW["Future work"]
-    LL["Lessons learned"] -.-> FW
-    FW -.-> EX
-```
+<p align="center">
+  <img src="diagrams/docs_flow.svg" width="78%" alt="Documentation flow">
+</p>
 
 The runbook drives the experiments, the experiments produce results, and the results
 become the report. The changelog and lessons learned are reviewed afterwards to decide

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="780" viewBox="0 0 1000 780">
+  <rect width="1000" height="780" fill="#ffffff"/>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#111111"/>
+    </marker>
+  </defs>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#111111">
+    <rect x="320" y="40" width="360" height="70" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+    <g text-anchor="middle" font-size="21">
+      <text x="500.0" y="82.3">Speed reference</text>
+    </g>
+    <rect x="320" y="150" width="360" height="70" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+    <g text-anchor="middle" font-size="21">
+      <text x="500.0" y="192.3">Speed PI</text>
+    </g>
+    <rect x="320" y="270" width="360" height="70" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+    <g text-anchor="middle" font-size="21">
+      <text x="500.0" y="312.4">DTC / SVM-DTC</text>
+    </g>
+    <rect x="320" y="390" width="360" height="70" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+    <g text-anchor="middle" font-size="21">
+      <text x="500.0" y="432.4">2-level inverter</text>
+    </g>
+    <rect x="320" y="510" width="360" height="70" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+    <g text-anchor="middle" font-size="21">
+      <text x="500.0" y="552.4">PMSM</text>
+    </g>
+    <rect x="320" y="630" width="360" height="70" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+    <g text-anchor="middle" font-size="21">
+      <text x="500.0" y="672.4">Flux / torque estimator</text>
+    </g>
+    <line x1="500" y1="110" x2="500" y2="145" stroke="#111111" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="500" y1="220" x2="500" y2="255" stroke="#111111" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="500" y1="340" x2="500" y2="375" stroke="#111111" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="500" y1="460" x2="500" y2="495" stroke="#111111" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="500" y1="580" x2="500" y2="615" stroke="#111111" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M 680 665 H 850 V 305 H 685" fill="none" stroke="#111111" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="858" y="490" text-anchor="start" font-size="15" fill="#333333">flux / torque</text>
+
+  </g>
+</svg>

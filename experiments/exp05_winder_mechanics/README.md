@@ -108,19 +108,9 @@ These are the complete top-level models: drive, estimator, controller, winder pl
 
 ## 5. What happens in one simulation run
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Arial, Helvetica, sans-serif', 'fontSize': '18px'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 40, 'rankSpacing': 50, 'padding': 12}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1.5px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1.5px !important; } .nodeLabel { font-size: 18px !important; } .edgeLabel { font-size: 16px !important; }'}}%%
-flowchart TD
-    A(["Start in MATLAB<br/>repository root"]) --> B["Load parameters<br/>pmsm_dtc_parameters.m<br/>winder_params.m"]
-    B --> C["Choose the case<br/>model · mode · r0 · tag · FF"]
-    C --> D["Initialise<br/>F0 = 15 N · H0 = 0 · Tsim = 2 s"]
-    D --> E["Simulate<br/>S-curve line speed · tension loop<br/>MaxStep = 5 µs"]
-    E --> F["Log signals<br/>F · ω · r · J · T_e · i_a"]
-    F --> G["Compute metrics<br/>RMSE · band · ripple · peak current"]
-    G --> H["Save<br/>results/val2s_tag.mat<br/>figures/fig2s_tag.png + .pdf"]
-    H --> I["Print the metric summary<br/>in the Command Window"]
-    I --> J(["Done"])
-```
+<p align="center">
+  <img src="../../docs/diagrams/exp05_simulation_flow.svg" width="62%" alt="One simulation run">
+</p>
 
 A single 2 s case takes a few minutes, because the solver is limited to 5 µs steps.
 

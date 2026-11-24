@@ -46,23 +46,9 @@ If `Rs_est` is wrong, the subtracted drop is wrong, and the flux estimate drifts
 
 ## How Rs error enters the drive
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Arial, Helvetica, sans-serif', 'fontSize': '18px'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 40, 'rankSpacing': 50, 'padding': 12}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1.5px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1.5px !important; } .nodeLabel { font-size: 18px !important; } .edgeLabel { font-size: 16px !important; }'}}%%
-flowchart LR
-    subgraph LOOP["Closed-loop drive"]
-        REF["Speed reference<br/>20 / 5 / 2 rad/s"] --> PI["Speed PI"]
-        PI --> CTRL["DTC or SVM-DTC"]
-        CTRL --> INV["Inverter"]
-        INV --> MOT["PMSM<br/>true Rs = 2.875 ohm"]
-        MOT --> FB["measured speed,<br/>currents, rotor angle"]
-        FB --> PI
-    end
-    FB --> EST["Flux estimator<br/>Rs_est = Rs x Rs_factor"]
-    EST -->|"estimated flux"| CTRL
-    FB --> TRUE["True flux<br/>from measured currents"]
-    EST --> MET["Metrics +<br/>lost-control flag"]
-    TRUE --> MET
-```
+<p align="center">
+  <img src="../../docs/diagrams/exp02_boundary.svg" width="85%" alt="Rs boundary map">
+</p>
 
 **Only the estimator changes.** The motor model always uses the true Rs = 2.875 Ω. The estimator uses `Rs_est = Rs × Rs_factor`.
 
@@ -83,14 +69,9 @@ Both models are the exp01 drives with two added hooks: an estimator Rs multiplie
 
 ## The boundary found here
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Arial, Helvetica, sans-serif', 'fontSize': '18px'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 40, 'rankSpacing': 50, 'padding': 12}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1.5px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1.5px !important; } .nodeLabel { font-size: 18px !important; } .edgeLabel { font-size: 16px !important; }'}}%%
-flowchart TB
-    A["Rs error"] --> B["Flux estimator uses<br/>the wrong resistive drop"]
-    B --> C["Estimated flux drifts"]
-    C --> D["Controller corrects<br/>an error that is not real"]
-    D --> E["Speed control lost"]
-```
+<p align="center">
+  <img src="../../docs/diagrams/exp02_rs_flow.svg" width="60%" alt="How Rs error enters the drive">
+</p>
 
 **In words:** at 20 rad/s the drive tolerates a 30% underestimate but not a 30% overestimate. At 5 and 2 rad/s it tolerates only the correct value. This is a coarse boundary; exp03 resolves it in smaller steps.
 

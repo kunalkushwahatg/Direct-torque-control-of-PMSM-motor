@@ -37,17 +37,9 @@
 
 ## Signal flow
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Arial, Helvetica, sans-serif', 'fontSize': '18px'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 40, 'rankSpacing': 50, 'padding': 12}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1.5px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1.5px !important; } .nodeLabel { font-size: 18px !important; } .edgeLabel { font-size: 16px !important; }'}}%%
-flowchart TB
-    SR["Speed reference"] --> SPI["Speed PI"]
-    SPI --> DTC["DTC / SVM-DTC"]
-    DTC --> INV["2-level inverter"]
-    INV --> PMSM["PMSM"]
-    PMSM --> EST["Flux / torque estimator"]
-    EST --> DTC
-    EST --> SPI
-```
+<p align="center">
+  <img src="../../docs/diagrams/exp01_signal_flow.svg" width="70%" alt="Signal flow of the PMSM DTC / SVM-DTC experiment">
+</p>
 
 **Two paths from the same torque command:**
 

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="360" viewBox="0 0 1000 360">
+  <rect width="1000" height="360" fill="#ffffff"/>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#111111"/>
+    </marker>
+  </defs>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#111111">
+    <text x="90" y="105" text-anchor="start" font-size="18" fill="#333333">20 rad/s</text>
+    <rect x="200" y="50" width="330" height="110" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+    <g text-anchor="middle" font-size="19">
+      <text x="365.0" y="87.9">Rs 70-100%</text>
+      <text x="365.0" y="111.7">kept control</text>
+      <text x="365.0" y="135.4">0.147-0.175 Wb</text>
+    </g>
+    <rect x="620" y="50" width="330" height="110" fill="#ffffff" stroke="#111111" stroke-width="2" stroke-dasharray="7 5"/>
+    <g text-anchor="middle" font-size="19">
+      <text x="785.0" y="87.9">Rs 105-130%</text>
+      <text x="785.0" y="111.7">lost</text>
+      <text x="785.0" y="135.4">77-244 ms</text>
+    </g>
+    <text x="90" y="245" text-anchor="start" font-size="18" fill="#333333">5 rad/s</text>
+    <rect x="200" y="190" width="330" height="110" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+    <g text-anchor="middle" font-size="19">
+      <text x="365.0" y="239.8">Rs 100%</text>
+      <text x="365.0" y="263.5">0.175 Wb</text>
+    </g>
+    <rect x="620" y="190" width="330" height="110" fill="#ffffff" stroke="#111111" stroke-width="2" stroke-dasharray="7 5"/>
+    <g text-anchor="middle" font-size="19">
+      <text x="785.0" y="227.9">every other value</text>
+      <text x="785.0" y="251.7">lost</text>
+      <text x="785.0" y="275.4">66-426 ms</text>
+    </g>
+
+  </g>
+</svg>

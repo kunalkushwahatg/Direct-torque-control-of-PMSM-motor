@@ -18,18 +18,9 @@
 
 ## The answer in one picture
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Arial, Helvetica, sans-serif', 'fontSize': '18px'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 40, 'rankSpacing': 50, 'padding': 12}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1.5px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1.5px !important; } .nodeLabel { font-size: 18px !important; } .edgeLabel { font-size: 16px !important; }'}}%%
-flowchart TB
-    subgraph S20["20 rad/s"]
-        direction LR
-        A["Rs 70-100%<br/>kept control<br/>flux 0.147-0.175 Wb"] --- B["Rs 105-130%<br/>lost in 77-244 ms"]
-    end
-    subgraph S5["5 rad/s"]
-        direction LR
-        C["Rs 100%<br/>flux 0.175 Wb"] --- D["every other value<br/>lost in 66-426 ms"]
-    end
-```
+<p align="center">
+  <img src="../../docs/diagrams/exp03_boundary.svg" width="85%" alt="Fine Rs boundary map">
+</p>
 
 > **Boundary:** at 20 rad/s, +5% is already fatal. At 5 rad/s, even −10% is fatal.
 
@@ -48,14 +39,9 @@ flowchart TB
 
 ## How Rs error becomes instability
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Arial, Helvetica, sans-serif', 'fontSize': '18px'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 40, 'rankSpacing': 50, 'padding': 12}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1.5px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1.5px !important; } .nodeLabel { font-size: 18px !important; } .edgeLabel { font-size: 16px !important; }'}}%%
-flowchart TB
-    A["Rs_est too high"] --> B["Too much resistive drop subtracted"]
-    B --> C["Estimated flux drifts"]
-    C --> D["Controller corrects<br/>a false flux error"]
-    D --> E["Speed control lost"]
-```
+<p align="center">
+  <img src="../../docs/diagrams/exp03_rs_flow.svg" width="60%" alt="How Rs error becomes instability">
+</p>
 
 **The hypothesis from exp02:** the flux-error dynamics are approximately
 

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1030" viewBox="0 0 900 1030">
+  <rect width="900" height="1030" fill="#ffffff"/>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#111111"/></marker></defs>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#111111">
+    <rect x="180" y="25" width="540" height="72" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+    <g text-anchor="middle" font-size="20">
+      <text x="450.0" y="55.5">Start in MATLAB</text>
+      <text x="450.0" y="80.5">repository root</text>
+    </g>
+    <line x1="450" y1="97" x2="450" y2="123" stroke="#111111" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="180" y="123" width="540" height="72" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+    <g text-anchor="middle" font-size="20">
+      <text x="450.0" y="141.0">Load parameters</text>
+      <text x="450.0" y="166.0">pmsm_dtc_parameters.m</text>
+      <text x="450.0" y="191.0">winder_params.m</text>
+    </g>
+    <line x1="450" y1="195" x2="450" y2="221" stroke="#111111" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="180" y="221" width="540" height="72" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+    <g text-anchor="middle" font-size="20">
+      <text x="450.0" y="251.5">Choose the case</text>
+      <text x="450.0" y="276.5">model / mode / r0 / tag / FF</text>
+    </g>
+    <line x1="450" y1="293" x2="450" y2="319" stroke="#111111" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="180" y="319" width="540" height="72" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+    <g text-anchor="middle" font-size="20">
+      <text x="450.0" y="349.5">Initialise</text>
+      <text x="450.0" y="374.5">F0 = 15 N, H0 = 0, Tsim = 2 s</text>
+    </g>
+    <line x1="450" y1="391" x2="450" y2="417" stroke="#111111" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="180" y="417" width="540" height="72" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+    <g text-anchor="middle" font-size="20">
+      <text x="450.0" y="447.5">Simulate</text>
+      <text x="450.0" y="472.5">S-curve line speed + tension loop</text>
+    </g>
+    <line x1="450" y1="489" x2="450" y2="515" stroke="#111111" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="180" y="515" width="540" height="72" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+    <g text-anchor="middle" font-size="20">
+      <text x="450.0" y="545.5">Log signals</text>
+      <text x="450.0" y="570.5">F, omega, r, J, Te, ia</text>
+    </g>
+    <line x1="450" y1="587" x2="450" y2="613" stroke="#111111" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="180" y="613" width="540" height="72" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+    <g text-anchor="middle" font-size="20">
+      <text x="450.0" y="643.5">Compute metrics</text>
+      <text x="450.0" y="668.5">RMSE, band, ripple, peak current</text>
+    </g>
+    <line x1="450" y1="685" x2="450" y2="711" stroke="#111111" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="180" y="711" width="540" height="72" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+    <g text-anchor="middle" font-size="20">
+      <text x="450.0" y="741.5">Save results</text>
+      <text x="450.0" y="766.5">val2s_tag.mat + fig2s_tag.png/.pdf</text>
+    </g>
+    <line x1="450" y1="783" x2="450" y2="809" stroke="#111111" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="180" y="809" width="540" height="72" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+    <g text-anchor="middle" font-size="20">
+      <text x="450.0" y="839.5">Print summary</text>
+      <text x="450.0" y="864.5">Command Window</text>
+    </g>
+    <line x1="450" y1="881" x2="450" y2="907" stroke="#111111" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="180" y="907" width="540" height="72" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+    <g text-anchor="middle" font-size="20">
+      <text x="450.0" y="950.0">Done</text>
+    </g>
+
+  </g>
+</svg>
