@@ -60,18 +60,29 @@ Both use the same voltage-model stator-flux estimator (λ ≈ 0.175 Wb), the sam
 ## 3. How the pieces fit
 
 ```mermaid
-flowchart LR
-    L["Line reference<br/>v_line: S-curve → 1.2 m/s"]
-    PI["Tension PI<br/>F_ref − F → draw"]
-    FF["Feedforward<br/>speed v_line / r<br/>torque J·dω/dt + (dJ/dt)·ω<br/>+ mode·F_ref·r + B·ω"]
-    SUM(("+"))
-    W["Speed reference<br/>ω_ref"]
-    SP["Speed loop<br/>PI → torque command"]
-    D["Classical DTC<br/>or SVM-DTC"]
-    M["PMSM + inverter"]
-    R["Winder roll + web<br/>r, J, F, ω"]
-    FB["Tension feedback<br/>2 Hz low-pass"]
-    MODE["Mode<br/>+1 wind · −1 unwind"]
+flowchart TB
+    subgraph REF["Reference"]
+        L["Line-speed reference<br/>S-curve to 1.2 m/s"]
+        MODE["Mode<br/>+1 wind / -1 unwind"]
+    end
+
+    subgraph LOOP["Tension and speed loops"]
+        PI["Tension PI<br/>F_ref - F -> draw"]
+        FF["Feedforward<br/>speed + torque + friction"]
+        SUM(("+"))
+        W["Speed reference"]
+        SP["Speed PI"]
+    end
+
+    subgraph DRIVE["PMSM drive"]
+        D["Classical DTC<br/>or SVM-DTC"]
+        M["PMSM + inverter"]
+    end
+
+    subgraph PLANT["Winder plant"]
+        R["Roll + web<br/>r, J, F, omega"]
+        FB["Tension feedback<br/>2 Hz low-pass"]
+    end
 
     L --> PI
     L --> FF
@@ -82,18 +93,18 @@ flowchart LR
     SUM --> W
     W --> SP
     SP --> D
-    D --> M
-    M -->|"T_e"| R
+    D -->|"T_e"| M
+    M --> R
     R -->|"F"| FB
     FB -->|"F"| PI
-    R -.->|"r, J, ω"| FF
+    R -. "r, J, omega" .-> FF
 
     classDef ref fill:#e8f0fe,stroke:#5b7fae,color:#17263c;
     classDef ctrl fill:#fff4e5,stroke:#c1873b,color:#3b2a12;
     classDef drive fill:#f1e8fb,stroke:#8a6bb0,color:#2b1b3d;
     classDef plant fill:#e8f6ee,stroke:#4c9169,color:#163322;
-    class L ref;
-    class PI,FF,SUM,W,SP,MODE ctrl;
+    class L,MODE ref;
+    class PI,FF,SUM,W,SP ctrl;
     class D,M drive;
     class R,FB plant;
 ```

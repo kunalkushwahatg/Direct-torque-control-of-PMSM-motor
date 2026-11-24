@@ -26,18 +26,27 @@ Two drive-level torque-control schemes are compared on **the same mechanical pla
 | **SVM-DTC** | Flux PI + torque PI + rotation + inverse Clarke | Fixed-frequency PWM (5 kHz) |
 
 ```mermaid
-flowchart LR
-    A[Line-speed reference] --> B[Tension PI]
-    C[Tension feedback] --> B
-    B --> D[Speed reference]
-    D --> E[Speed PI]
-    E --> F[DTC / SVM-DTC]
-    F --> G[Inverter]
-    G --> H[PMSM]
-    H --> I[Winder / unwinder plant]
-    I --> C
-    J[Radius + inertia + tension feedforward] --> E
-    J --> F
+flowchart TB
+    L["Line-speed reference"] --> TPI["Tension PI"]
+    FB["Tension feedback"] --> TPI
+    TPI --> WREF["Speed reference"]
+    FF["Radius + inertia + tension feedforward"] --> WREF
+    WREF --> SPD["Speed PI"]
+    SPD --> DTC["DTC / SVM-DTC"]
+    DTC --> INV["Inverter"]
+    INV --> PMSM["PMSM"]
+    PMSM --> WIND["Winder / unwinder plant"]
+    WIND --> FB
+    WIND -. "radius, inertia" .-> FF
+
+    classDef ref fill:#e8f0fe,stroke:#5b7fae,color:#17263c;
+    classDef ctrl fill:#fff4e5,stroke:#c1873b,color:#3b2a12;
+    classDef drive fill:#f1e8fb,stroke:#8a6bb0,color:#2b1b3d;
+    classDef plant fill:#e8f6ee,stroke:#4c9169,color:#163322;
+    class L,FB ref;
+    class TPI,FF,WREF,SPD ctrl;
+    class DTC,INV,PMSM drive;
+    class WIND plant;
 ```
 
 The project covers:
