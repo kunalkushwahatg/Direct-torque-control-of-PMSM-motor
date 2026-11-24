@@ -1010,7 +1010,7 @@ Continuous velocity, zero acceleration at both ends, identical for winding and
 unwinding. The feedforward uses the analytic derivative `dv/dt` instead of a
 gated constant slope, which also removes the old ramp-end discontinuity.
 
-Effect (SVM winding, 2 s, damped web):
+Effect (SVM winding, 2 s, damped web; historical comparison before the final filter/feedforward corrections):
 
 | reference | F RMSE | min | max |
 |---|---|---|---|
@@ -1064,8 +1064,8 @@ tag is lowercased with periods removed (`SVM_wind_v0.8_ff1` becomes
    term `(dJ/dt)ω`, an analytic S-curve derivative, and a mode-dependent
    correction sign, evaluated with FF on/off on both controllers.
 4. A measured comparison showing the trade-off: classical DTC + FF gives the
-   tightest tension band but ~5× the torque ripple and higher peak current;
-   SVM-DTC is smoother and draws less current.
+   tightest winding band but about 6× the torque ripple and higher peak current;
+   SVM-DTC is tighter in unwinding, smoother, and draws less current.
 5. Identification of the undamped web–roll torsional mode (~50–57 Hz) and a
    physically justified Kelvin–Voigt damping parameter (`C = 500 N·s/m`,
    ζ ≈ 0.3), rather than a gain tweak.

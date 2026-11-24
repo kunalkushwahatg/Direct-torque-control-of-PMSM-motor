@@ -2,8 +2,22 @@
 % Tests the prediction  d(err)/dt = ((Rs_est - Rs)/L) * err + ...   i.e. growth rate k = (factor-1)*Rs/L  for factor > 1.
 exp_root = fileparts(fileparts(mfilename('fullpath'))); rdir = fullfile(exp_root,'results'); fdir = fullfile(exp_root,'figures');
 exp2 = fullfile(fileparts(exp_root),'exp02_robustness','results');
-Rs = 2.875; L = 8.5e-3; ctl = {'svm','cl'}; ctlname = {'SVM-DTC','Classical DTC'}; speeds = [20 5]; fac = [70 80 90 100 105 110 120 130];
+run(fullfile(exp_root,'scripts','pmsm_dtc_parameters.m'));
+assert(Ld == Lq, 'The growth-rate model assumes Ld = Lq.');
+L = Ld; ctl = {'svm','cl'}; ctlname = {'SVM-DTC','Classical DTC'}; speeds = [20 5]; fac = [70 80 90 100 105 110 120 130];
 loadr = @(c,w,f) loadcase(rdir,exp2,c,w,f);
+
+% Fail before overwriting the published table when exp02 baseline cases are missing.
+missing = {};
+for c = ctl, for w = speeds, for f = [70 100 130]
+    if w == 20, nm2 = sprintf('%s_mid_rs%03d',c{1},f); else, nm2 = sprintf('%s_low_w%d_rs%03d',c{1},w,f); end
+    if ~exist(fullfile(exp2,['result_' nm2 '.mat']),'file')
+        missing{end+1} = nm2; %#ok<SAGROW>
+    end
+end, end, end
+if ~isempty(missing)
+    error('Missing exp02 baseline cases: %s. Run exp02 first; refusing to overwrite metrics_summary.csv.', strjoin(missing, ', '));
+end
 
 %% collect
 n = 0; rows = {}; D = struct();
@@ -55,7 +69,7 @@ save_figure(f1,'fig01_true_flux_vs_assumed_Rs',fdir); close(f1);
 
 f2 = mk(520);                                               % fig02: growth rate measured vs predicted
 hold on; for c = 1:2
-    k = strcmp(T.controller, ctlname{c}) & T.Rs_pct > 100 & ~isnan(T.growth_rate_meas); plot(T.growth_rate_pred(k), T.growth_rate_meas(k), 'o', 'Color', cc{c}, 'MarkerFaceColor', cc{c}, 'MarkerSize', 7);
+    k = strcmp(T.controller, ctlname{c}) & T.Rs_pct > 100 & T.speed_ref == 20 & ~isnan(T.growth_rate_meas); plot(T.growth_rate_pred(k), T.growth_rate_meas(k), 'o', 'Color', cc{c}, 'MarkerFaceColor', cc{c}, 'MarkerSize', 7);
 end
 lim = [0 max([T.growth_rate_pred; 1])]; plot(lim, lim, 'k--'); grid on; xlabel('predicted growth rate (Rs_{est} - Rs)/L  [1/s]'); ylabel('measured growth rate of flux error [1/s]');
 legend('SVM-DTC','Classical DTC','prediction','Location','northwest'); title('Does the simple model explain the instability?');

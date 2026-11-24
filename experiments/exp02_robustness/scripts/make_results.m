@@ -36,7 +36,7 @@ for c = 1:2, for j = 1:3
     r = get_result(tag(c,1,rsf(j))); subplot(3,2,(j-1)*2+c); hold on;
     plot(r.sig.t,r.sig.lam,'Color',[0.6 0.6 0.6],'LineWidth',0.5); plot(r.sig.t,r.sig.lam_true,'Color',col{c},'LineWidth',0.5); grid on; ylim([0 0.6]);
     title(sprintf('%s, estimator Rs = %d %%', ctlname{c}, rsf(j))); if j==1 && c==1, legend('estimated flux (controller sees)','true flux (motor)','Location','east'); end
-    if j==3, xlabel('t [s]'); end; ylabel('flux [Wb]');
+    if j==3, xlabel('t [s]'); text(0.02,0.92,'estimated flux off-scale (16-24 Wb)','Units','normalized','FontSize',8); end; ylabel('flux [Wb]');
 end, end
 save_figure(f,'fig01_flux_estimated_vs_true_mid_speed',fdir); close(f);
 
