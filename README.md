@@ -72,6 +72,14 @@ Representative final results from the 2 s, damped-web, S-curve matrix:
   <img src="experiments/exp05_winder_mechanics/figures/fig2s_SVM_wind_ff1.png" width="48%" alt="SVM-DTC winding waveforms">
 </p>
 
+### Overlay comparison
+
+<p align="center">
+  <img src="reports/final_2026-11/figures/fig_overlay3.png" width="100%" alt="Classical DTC vs SVM-DTC overlay: web tension, motor torque and surface-speed mismatch">
+</p>
+
+*Classical DTC vs SVM-DTC on the same winding case with feedforward on: web tension, motor torque, and surface-speed mismatch.*
+
 ### Whole-model screenshots
 
 <p align="center">
