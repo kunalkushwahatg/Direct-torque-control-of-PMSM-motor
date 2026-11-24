@@ -1,61 +1,63 @@
 # Experiment 01 — SVM-DTC vs classical DTC
 
-**Same motor, same load, two ways of choosing the inverter voltage.**
+Comparison of classical hysteresis-based direct torque control (DTC) and space-vector-modulated DTC (SVM-DTC) on the same surface-mounted PMSM. Both controllers use the same speed PI, flux estimator, and 20 µs control period.
 
-## At a glance
+## Summary
 
-| | |
+| Item | Detail |
 |---|---|
 | **Question** | How much smoother is SVM-DTC than classical DTC, and what does it cost in speed dynamics? |
-| **Plant** | Surface-mounted PMSM: Rs 2.875 Ω, Ld = Lq 8.5 mH, λf 0.175 Wb, 4 pole pairs |
+| **Plant** | Surface-mounted PMSM: Rs = 2.875 Ω; Ld = Lq = 8.5 mH; λf = 0.175 Wb; 4 pole pairs |
 | **Controllers** | Classical DTC: hysteresis + switching table. SVM-DTC: torque/flux PI + space-vector modulation at 5 kHz |
 | **Tests** | 1 dynamic test (0 → 20 rad/s, 0.5 → 2 N·m) + a 6-point speed × load sweep |
 | **Runs** | 14 simulations: 7 per controller |
 | **Runtime** | ≈3 h in one session (machine-dependent); ≈1.5 h per controller with two sessions |
-| **Main result** | 3–12× lower torque ripple and 3–7× lower flux ripple for SVM-DTC; speed dynamics are close |
+| **Main result** | Torque ripple 3.5–13× lower at 0.5 N·m and 3–6.5× lower at 4 N·m; flux ripple 3–7× lower; speed dynamics are close |
 | **Software** | MATLAB R2026a (or compatible), Simulink, Simscape, Simscape Electrical |
 | **Outputs** | `results/metrics_summary.csv`, 9 figures, one `.mat` per case |
 
-## Words you need
+Torque ripple produces vibration, acoustic noise, and current harmonics, so lower ripple is a drive-quality gain. Classical DTC is simple and fast but produces a coarse voltage waveform; SVM-DTC adds computation to synthesize a smoother average voltage. This experiment quantifies that trade-off and provides the nominal-parameter baseline for the Rs-error tests in exp02 and exp03.
 
-| Term | Plain meaning |
-|---|---|
-| **PMSM** | Permanent-magnet synchronous motor — the motor being controlled. |
-| **DTC** | Direct Torque Control — choose an inverter state directly from the torque and flux errors. |
-| **SVM** | Space-Vector Modulation — build a smooth average voltage from the inverter's discrete states. |
-| **Flux** | Magnetic strength in the stator. There is no flux sensor, so the controller estimates it. |
-| **Wb** | Weber — the unit of magnetic flux. Nominal value here: 0.175 Wb. |
-| **rad/s** | Angular speed. 2π rad/s ≈ one revolution per second. |
-| **Torque ripple** | Fast wobble of torque around its average. Lower is smoother. |
-| **THD** | Total harmonic distortion — how far the current waveform is from a pure sine. |
+## Nomenclature
 
-## Why it matters
-
-- Torque ripple causes vibration, acoustic noise and extra current harmonics. Lower ripple is a real drive-quality gain.
-- Classical DTC is simple and fast but rough. SVM-DTC adds computation to get a smoother voltage. The trade-off should be measured, not guessed.
-- This experiment is the baseline for the robustness tests in exp02 and exp03.
+| Symbol / term | Definition | Unit |
+|---|---|---|
+| **PMSM** | Surface-mounted permanent-magnet synchronous motor | — |
+| **DTC** | Direct torque control; inverter states selected from torque and flux hysteresis outputs | — |
+| **SVM** | Space-vector modulation; average voltage synthesized from the inverter's discrete states | — |
+| **Rs** | Stator resistance, 2.875 Ω | Ω |
+| **Ld, Lq** | Stator inductances, 8.5 mH each | mH |
+| **λf** | Permanent-magnet flux linkage, 0.175 Wb | Wb |
+| **p** | Pole pairs, 4 | — |
+| **Te** | Electromagnetic torque, reconstructed as 1.5 p λf iq | N·m |
+| **ω** | Angular speed | rad/s |
+| **Torque ripple** | RMS or peak-to-peak deviation of Te from its mean | N·m |
+| **THD** | Total harmonic distortion of phase current, harmonics up to 20 kHz | % |
 
 ## Signal flow
 
-<p align="center">
-  <img src="../../docs/diagrams/exp01_signal_flow.svg" width="70%" alt="Signal flow of the PMSM DTC / SVM-DTC experiment">
-</p>
+![Signal flow of the PMSM DTC and SVM-DTC experiment](../../docs/diagrams/exp01_signal_flow.svg)
 
-**Two paths from the same torque command:**
+*Figure 1. Signal flow for the two controllers. Both share the speed PI, flux estimator, and 20 µs control period.*
 
-- **Classical DTC** sends the torque and flux errors to hysteresis comparators; a switching table picks one of the inverter's active vectors. The switching frequency is not fixed.
-- **SVM-DTC** sends the errors to PI regulators, builds a voltage reference, and modulates it with a 5 kHz carrier. The switching frequency is fixed.
+The two controllers receive the same torque command:
+
+- **Classical DTC** sends the torque and flux errors to hysteresis comparators; a switching table selects one of the inverter's active vectors. The switching frequency is not fixed.
+- **SVM-DTC** sends the errors to PI regulators, constructs a voltage reference, and modulates it with a 5 kHz carrier. The switching frequency is fixed.
 
 Both controllers use the same 20 µs control period and the same speed PI.
 
 ## Whole-model screenshots
 
-<p align="center">
-  <img src="../../docs/screenshots/exp01_classic_dtc_final.png" width="49%" alt="Classical DTC whole model">
-  <img src="../../docs/screenshots/exp01_svm_dtc_final.png" width="49%" alt="SVM-DTC whole model">
-</p>
+![Classical DTC top-level model](../../docs/screenshots/exp01_classic_dtc_final.png)
 
-These are the full top-level models: PMSM, inverter, sensors, estimator, controller, speed loop, load, and logging.
+*Figure 2a. Classical DTC top-level model.*
+
+![SVM-DTC top-level model](../../docs/screenshots/exp01_svm_dtc_final.png)
+
+*Figure 2b. SVM-DTC top-level model.*
+
+Both are complete top-level models: PMSM, inverter, sensors, estimator, controller, speed loop, load, and logging.
 
 ## Test plan
 
@@ -112,7 +114,7 @@ sel = 2; run_all   % classical DTC only
 exp01_svm_vs_classic_dtc/
 ├── models/    svm_dtc_final.slx, classic_dtc_final.slx
 ├── scripts/   pmsm_dtc_parameters.m, dtc_metrics.m, run_case.m,
-│              run_all.m, make_results.m, build_final.m
+│              run_all.m, make_results.m, build_final_models_historical.m
 ├── results/   result_<tag>.mat (14), metrics_summary.csv
 └── figures/   fig01 ... fig09  (PNG + PDF + FIG)
 ```
@@ -125,7 +127,7 @@ exp01_svm_vs_classic_dtc/
 | `figures/fig04–fig05` | Phase-A current waveform and spectrum. |
 | `figures/fig06–fig09` | Sweep bars: torque ripple, THD, flux ripple, switching frequency. |
 
-`build_final.m` documents how the two final models were derived; it is not needed for reproduction.
+`build_final_models_historical.m` documents how the two final models were derived; it is not needed for reproduction.
 
 A fresh clone may not include the large `.mat` or `.fig` files; regenerate them with `run_all` and `make_results`.
 
@@ -155,23 +157,23 @@ All values are RMS of the true torque. At 2 N·m the peak-to-peak ripple is 2.09
 | Recovery after load step | 21.0 ms | 20.7 ms |
 | Torque rise, 10–90% | 2.52 ms | 1.86 ms |
 
-**Reading the trade-off:** SVM-DTC clearly wins on ripple and current distortion. The speed loop is the same PI for both controllers and was not retuned, so the small differences in overshoot, settling and dip are indicative rather than a controller ranking. SVM-DTC does raise torque faster (1.86 vs 2.52 ms).
+SVM-DTC has lower torque ripple and current distortion. The speed loop is the same PI for both controllers and was not retuned, so the differences in overshoot, settling time, and load dip are indicative rather than a controller ranking. SVM-DTC raises torque faster (1.86 ms vs 2.52 ms).
 
-THD is load-dependent: at 0.5 N·m the fundamental current is small, so both show high THD (classical ≈104%, SVM 14–25%). Compare THD at the same load, not across loads.
+THD is load-dependent: at 0.5 N·m the fundamental current is small, so both controllers show high THD (classical ≈104%, SVM 14–25%). Compare THD at the same load, not across loads.
 
 ### Figures
 
 ![Dynamic test overview](figures/fig01_dynamic_overview.png)
 
-*Dynamic test: torque, speed and stator flux. The load step at 0.5 s is visible in all three traces.*
+*Figure 3. Dynamic test: torque, speed and stator flux. The load step at 0.5 s is visible in all three traces.*
 
 ![Loaded torque zoom](figures/fig02_torque_steady_zoom.png)
 
-*True torque at 2 N·m. Classical DTC (top) swings about ±1 N·m; SVM-DTC (bottom) stays in a narrow band.*
+*Figure 4. True torque at 2 N·m. Classical DTC (top) swings about ±1 N·m; SVM-DTC (bottom) stays in a narrow band.*
 
 ![Torque ripple across the sweep](figures/fig06_sweep_torque_ripple.png)
 
-*True torque ripple RMS at all six sweep points. SVM-DTC is lower everywhere, but the gap narrows at high speed and high load.*
+*Figure 5. True torque ripple RMS at all six sweep points. SVM-DTC is lower everywhere, but the gap narrows at high speed and high load.*
 
 ## Limitations
 
@@ -182,5 +184,14 @@ THD is load-dependent: at 0.5 N·m the fundamental current is small, so both sho
 - **One operating envelope:** one motor, one DC bus, one speed-loop tuning; no hardware validation.
 - **Fixed carrier:** the SVM carrier is 5 kHz. A different carrier frequency would change the ripple/THD trade-off.
 - **THD caveat:** light-load THD is relative to a small fundamental, so it is not a fair "efficiency" number.
+
+## References
+
+Reference list and BibTeX keys: [refs.bib](../../reports/final_2026-11/refs.bib).
+
+- Takahashi, I., & Noguchi, T. (1986). A new quick-response and high-efficiency control strategy of an induction motor. *IEEE Trans. Ind. Appl.* Key: `takahashi1986`.
+- Depenbrock, M. (1988). Direct self-control (DSC) of inverter-fed induction machine. *IEEE Trans. Power Electron.* Key: `depenbrock1988`.
+- Zhong, L., Rahman, M. F., Hu, W. Y., & Lim, K. W. (1997). Analysis of direct torque control in permanent magnet synchronous motor drives. *IEEE Trans. Power Electron.* Key: `zhong1997`.
+- Buja, G. S., & Kazmierkowski, M. P. (2004). Direct torque control of PWM inverter-fed AC motors — a survey. *IEEE Trans. Ind. Electron.* Key: `buja2004`.
 
 Next: [Experiment 02 — robustness to Rs error](../exp02_robustness/README.md)

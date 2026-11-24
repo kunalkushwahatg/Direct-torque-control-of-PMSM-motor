@@ -1,5 +1,5 @@
 function export_model_screenshots()
-%EXPORT_MODEL_SCREENSHOTS  Save full top-level screenshots of every Simulink model.
+%EXPORT_MODEL_SCREENSHOTS  Save full top-level screenshots of the canonical Simulink models.
 %
 % Run from the repository root, or with tools/ on the MATLAB path:
 %   addpath('tools')

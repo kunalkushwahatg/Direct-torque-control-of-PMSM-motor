@@ -1,4 +1,4 @@
-# Overleaf / latexmk: compile main.tex with XeLaTeX (needed for the real Times New Roman font in ./fonts)
+# Overleaf / latexmk: compile main.tex with XeLaTeX (free TeX Gyre Termes)
 $pdf_mode = 5;
 $postscript_mode = 0;
 $dvi_mode = 0;

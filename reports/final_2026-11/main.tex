@@ -1,12 +1,12 @@
 %% Final research project report - winder/unwinder tension control
-%% Compile with XeLaTeX (real Times New Roman from ./fonts) - Overleaf: Menu > Compiler > XeLaTeX.
+%% Compile with XeLaTeX (free TeX Gyre Termes, Times-compatible).
 %% If compiled with pdfLaTeX it falls back to a Times-compatible font automatically.
 \documentclass[12pt,a4paper,onecolumn]{IEEEtran}
 
 \usepackage{iftex}
 \ifXeTeX
   \usepackage{fontspec}
-  \setmainfont{times.ttf}[Path=./fonts/, BoldFont=timesbd.ttf, ItalicFont=timesi.ttf, BoldItalicFont=timesbi.ttf]
+  \setmainfont{TeX Gyre Termes}
   \usepackage{amsmath}
   \usepackage{unicode-math}
   \setmathfont{texgyretermes-math.otf}[Path=./fonts/]
@@ -30,6 +30,7 @@
 \newif\iftoc \tocfalse         % contents page
 
 \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=blue]{hyperref}
+\hypersetup{pdftitle={Direct Torque Control of a PMSM Winder/Unwinder Drive},pdfauthor={Kunal Kushwaha}}
 
 % ---------- helpers ----------
 \newcommand{\Nm}{\,\mathrm{N\cdot m}}
@@ -51,8 +52,8 @@
 \singlespacing
 \vspace*{0.3cm}
 \includegraphics[width=3.4cm]{figures/nitrkl.jpg}\\[0.8cm]
-{\Large \textbf{Project Report}}\\[1.0cm]
-{\Huge \textbf{Direct Torque Control of\\ PMSM Motor}}\\[1.4cm]
+{\Large \textbf{Final Research Project Report}}\\[1.0cm]
+{\Huge \textbf{Direct Torque Control of a\\ PMSM Winder/Unwinder Drive}}\\[1.4cm]
 {\large Submitted by}\\[0.3cm]
 {\Large \textbf{Kunal Kushwaha}}\\[0.2cm]
 {\large Roll No.\ 123EE0291}\\[1.2cm]
@@ -61,6 +62,7 @@
 {\large Department of Electrical Engineering}\\[0.2cm]
 {\large National Institute of Technology Rourkela}\\[0.2cm]
 {\large Odisha, India -- 769008}\\[1.8cm]
+{\large November 2026}\\[1.0cm]
 \hfill\begin{tabular}{c}
 \rule{6.5cm}{0.4pt}\\
 \small Signature of the supervisor
@@ -71,7 +73,7 @@
 
 %% =====================  ABSTRACT  =====================
 \begin{center}\textbf{\large Abstract}\end{center}
-\noindent Web tension in winding and unwinding systems is affected by the continuously varying roll radius and inertia and by the torque ripple of the drive. This report presents a physically consistent winder model and compares classical direct torque control (DTC) with space-vector-modulated DTC (SVM-DTC) under identical mechanics. The plant uses the momentum form of the variable-inertia equation, a Kelvin--Voigt web and a cubic S-curve line-speed reference. An outer tension loop trims the speed reference and is supported by radius and model-based torque feedforward. The plant model is presented, and both drives are tested in winding and unwinding over line-speed, initial-radius and tension-step variations. Feedforward reduces the tension RMSE by 88--98\% and avoids torque saturation. SVM-DTC reduces the torque ripple by roughly an order of magnitude and lowers the peak current, while classical DTC gives slightly tighter steady tension in winding; a residual oscillation remains in the SVM winding case. The results quantify the trade-off between electrical smoothness and tension regulation in winder drives.
+\noindent Web tension in winding and unwinding systems is affected by the continuously varying roll radius and inertia and by the torque ripple of the drive. This report presents a physically consistent winder model and compares classical direct torque control (DTC) with space-vector-modulated DTC (SVM-DTC) under identical mechanics. The plant uses the momentum form of the variable-inertia equation, a Kelvin--Voigt web and a cubic S-curve line-speed reference. An outer tension loop trims the speed reference and is supported by radius and model-based torque feedforward. The plant model is presented, and both drives are tested in winding and unwinding over line-speed, initial-radius and tension-step variations. Feedforward reduces the tension RMSE by 89--98\% and avoids torque saturation. SVM-DTC reduces the torque ripple by roughly an order of magnitude and lowers the peak current, while classical DTC gives slightly tighter steady tension in winding; a residual oscillation remains in the SVM winding case. The results quantify the trade-off between electrical smoothness and tension regulation in winder drives.
 
 \vspace{0.2cm}
 \noindent\textit{Keywords:} winder, web tension, PMSM, direct torque control, SVM-DTC, feedforward, variable inertia.
@@ -370,19 +372,19 @@ The control period is 20~\textmu s, the DC bus is 300~V, the torque limit is $5\
 %% =====================  VI. RESULTS  =====================
 \section{Results}\label{sec:res}
 \subsection{Effect of the feedforward}\label{sec:ff}
-Figure~\ref{fig:ff} compares the tension RMSE with and without feedforward for the four nominal cases. Without feedforward the PI has to supply the whole acceleration torque: the tension overshoots to 21--23~N and takes about 1.5~s to recover, giving an RMSE of about 6.2~N in winding. With feedforward the RMSE falls to 0.77~N for SVM-DTC and 0.27~N for classical DTC in winding, and to 0.05~N and 0.10~N in unwinding. The reduction is 88--98\%. The torque never reaches the 5~N$\cdot$m limit in any of the cases.
+Figure~\ref{fig:ff} compares the tension RMSE with and without feedforward for the four nominal cases. Without feedforward the PI has to supply the whole acceleration torque: the tension overshoots to about 23~N and takes about 1.5~s to recover, giving an RMSE of about 7.2~N in winding. With feedforward the RMSE falls to 0.79~N for SVM-DTC and 0.32~N for classical DTC in winding, and to 0.052~N and 0.114~N in unwinding. The reduction is 89--98\%. The torque never reaches the 5~N$\cdot$m limit in any of the cases.
 
 \begin{figure}[!t]
 \centering
 \figgraphic{0.95}{figures/fig_summary_ff.png}
-\caption{Tension RMSE with feedforward off and on (left) and torque ripple with feedforward on (right), for the four nominal cases.}
+\caption{Tension RMSE and torque ripple with feedforward off and on, for the four nominal cases.}
 \label{fig:ff}
 \end{figure}
 
 The feedforward also removes the large transient at the start of the ramp. Without it, the tension collapse and the subsequent overshoot are visible in the tension trace; with it, the tension stays close to the setpoint from the beginning of the acceleration. This is the expected behaviour: the disturbance is predictable, so it should not be left to the feedback loop.
 
 \subsection{Winding and unwinding}
-Table~\ref{tab:main} lists the four feedforward-on cases, and Figs.~\ref{fig:cw} and~\ref{fig:sw} show the corresponding six-panel results for winding. Both drives regulate the mean tension at 15~N. The classical drive is tighter in steady winding tension (14.0--15.9~N), but its torque ripple is about $0.42\Nm$, roughly six times that of SVM-DTC, and its peak current is higher (1.98 against 1.22~A). SVM-DTC is electrically smoother, but its winding tension shows a residual oscillation during the ramp, with a minimum of about 10~N and a maximum of about 17~N. In unwinding both drives are tight: the SVM RMSE is 0.05~N and the classical RMSE is 0.10~N, and the radius and inertia fall as the roll empties. Figure~\ref{fig:overlay} overlays the two drives for the three signals that differ; the radius, inertia and speed are essentially common.
+Table~\ref{tab:main} lists the four feedforward-on cases, and Figs.~\ref{fig:cw} and~\ref{fig:sw} show the corresponding six-panel results for winding. Both drives regulate the mean tension at 15~N. The classical drive is tighter in steady winding tension (14.0--16.2~N), but its torque ripple is about $0.42\Nm$, about 6 times that of SVM-DTC, and its peak current is higher (1.98 against 1.22~A). SVM-DTC is electrically smoother, but its winding tension shows a residual oscillation during the ramp, with a minimum of about 10~N and a maximum of about 17~N. In unwinding both drives are tight: the SVM RMSE is 0.052~N and the classical RMSE is 0.114~N, and the radius and inertia fall as the roll empties. Figure~\ref{fig:overlay} overlays the two drives for the three signals that differ; the radius, inertia and speed are essentially common.
 
 \begin{table}[!t]
 \centering
@@ -393,10 +395,10 @@ Table~\ref{tab:main} lists the four feedforward-on cases, and Figs.~\ref{fig:cw}
 \toprule
 Case & $F$ RMSE (N) & $F$ range (N) & $T_e$ ripple (N$\cdot$m) & $I_a$ peak (A) \\
 \midrule
-SVM wind & 0.77 & 10.0--17.3 & 0.072 & 1.22 \\
-SVM unwind & 0.05 & 8.8--17.4 & 0.019 & 1.72 \\
-Classical wind & 0.27 & 14.0--15.9 & 0.418 & 1.98 \\
-Classical unwind & 0.10 & 13.4--16.7 & 0.416 & 2.55 \\
+SVM wind & 0.79 & 10.0--17.2 & 0.072 & 1.22 \\
+SVM unwind & 0.052 & 8.8--17.4 & 0.019 & 1.72 \\
+Classical wind & 0.32 & 14.0--16.2 & 0.418 & 1.98 \\
+Classical unwind & 0.114 & 12.9--16.0 & 0.414 & 2.57 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -465,13 +467,13 @@ Unwinding, $r_0=0.10$~m & 0.37 & 0.11 \\
 \section{Discussion}\label{sec:disc}
 The results show a clear division of labour. The feedforward is the dominant enabler: it removes the predictable inertia and load torque, and the PI is left with a small correction. This is why the RMSE drops by almost two orders of magnitude in unwinding and by a factor of eight in SVM winding. The radius feedforward is also necessary, but it is a steady-state term; it cannot supply the acceleration torque, which is why the full torque feedforward is what changes the transient.
 
-The drive comparison is more nuanced than ``SVM is better''. SVM-DTC is clearly better electrically: about six times lower torque ripple in winding, about twenty times lower in unwinding, and a lower peak current. Classical DTC, however, gives tighter steady tension in winding. The reason is that the switching table acts as a natural filter and the classical speed loop tracks slightly better in this operating point, while the SVM voltage command and estimator interact with the tension loop during the ramp. This residual oscillation is the main open issue; it is bounded and does not saturate the drive, but it is visible in the tension trace.
+The drive comparison is more nuanced than ``SVM is better''. SVM-DTC is clearly better electrically: about 6 times lower torque ripple in winding, about 22 times lower in unwinding, and a lower peak current. Classical DTC, however, gives tighter steady tension in winding. The reason is that the switching table acts as a natural filter and the classical speed loop tracks slightly better in this operating point, while the SVM voltage command and estimator interact with the tension loop during the ramp. This residual oscillation is the main open issue; it is bounded and does not saturate the drive, but it is visible in the tension trace.
 
 Several limitations should be stated. The study is a simulation study; the mechanical parameters are illustrative and have not been identified from a machine. The web damping is constant, the inverter is ideal (no dead time), and the tension loop uses a speed trim rather than a torque-mode winder control. The gains are fixed; a radius-scheduled gain would be the natural next step. Finally, the comparison covers one motor and one inverter, so the absolute numbers are not universal.
 
 %% =====================  IX. CONCLUSION  =====================
 \section{Conclusion and Future Work}\label{sec:concl}
-A physically consistent winder plant was built, and a tension architecture with radius and torque feedforward was applied identically to classical DTC and SVM-DTC. Feedforward reduces the tension RMSE by 88--98\% and avoids torque saturation. SVM-DTC reduces the torque ripple by roughly an order of magnitude and lowers the peak current, while classical DTC gives slightly tighter steady tension in winding; a residual oscillation remains in the SVM winding case. The results quantify the trade-off between electrical smoothness and tension regulation for winder drives.
+A physically consistent winder plant was built, and a tension architecture with radius and torque feedforward was applied identically to classical DTC and SVM-DTC. Feedforward reduces the tension RMSE by 89--98\% and avoids torque saturation. SVM-DTC reduces the torque ripple by roughly an order of magnitude and lowers the peak current, while classical DTC gives slightly tighter steady tension in winding; a residual oscillation remains in the SVM winding case. The results quantify the trade-off between electrical smoothness and tension regulation for winder drives.
 
 Future work will address the SVM winding oscillation, add a torque-mode winder loop, schedule the tension gains with the radius, include inverter dead time and parameter uncertainty, and validate the model against an experimental winder.
 

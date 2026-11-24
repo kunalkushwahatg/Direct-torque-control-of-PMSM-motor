@@ -7,7 +7,7 @@ for i = 1:numel(files)
     tmp = load(fullfile(rdir,files(i).name),'r');
     R.(matlab.lang.makeValidName(erase(erase(files(i).name,'result_'),'.mat'))) = tmp.r;
 end
-get = @(tag) R.(matlab.lang.makeValidName(tag));
+get_result = @(tag) R.(matlab.lang.makeValidName(tag));
 cases = {'mid',20; 'low_w5',5; 'low_w2',2}; rsf = [70 100 130]; ctl = {'svm','cl'}; ctlname = {'SVM-DTC','Classical DTC'};
 tag = @(c,k,f) sprintf('%s_%s_rs%03d', ctl{c}, cases{k,1}, f);
 
@@ -17,12 +17,12 @@ fprintf('%-14s %-7s | %-34s | %-34s\n','Speed [rad/s]','Rs fact','SVM-DTC','Clas
 fprintf('%-14s %-7s | %-34s | %-34s\n','','','true flux / torque ripple / state','true flux / torque ripple / state');
 for k = 1:3, for f = rsf
     out = cell(1,2);
-    for c = 1:2, s = get(tag(c,k,f)).ss; st = 'ok'; if s.lost_control, st = 'LOST CONTROL'; end
+    for c = 1:2, s = get_result(tag(c,k,f)).ss; st = 'ok'; if s.lost_control, st = 'LOST CONTROL'; end
         out{c} = sprintf('%6.3f Wb / %7.3f N.m / %s', s.lam_true_mean, s.Te_true_rms, st); end
     fprintf('%-14d %-7s | %-34s | %-34s\n', cases{k,2}, sprintf('%d %%',f), out{1}, out{2});
 end, end
 fprintf('\n=== SPEED REVERSAL +5 -> -5 rad/s (nominal Rs) ===\n');
-for c = 1:2, r = get([ctl{c} '_reversal']);
+for c = 1:2, r = get_result([ctl{c} '_reversal']);
     fprintf('%-14s forward: ripple %.3f N.m, flux err %.4f | reverse: ripple %.3f N.m, flux err %.4f | lost: %d/%d\n', ctlname{c}, r.fwd.Te_true_rms, r.fwd.flux_err_rms, r.rev.Te_true_rms, r.rev.flux_err_rms, r.fwd.lost_control, r.rev.lost_control);
 end
 
@@ -33,7 +33,7 @@ newfig = @(h) figure('Visible','off','Position',[100 100 1200 h],'Color','w');
 % fig01: estimated vs true flux, mid speed, three Rs values, both controllers
 f = newfig(850);
 for c = 1:2, for j = 1:3
-    r = get(tag(c,1,rsf(j))); subplot(3,2,(j-1)*2+c); hold on;
+    r = get_result(tag(c,1,rsf(j))); subplot(3,2,(j-1)*2+c); hold on;
     plot(r.sig.t,r.sig.lam,'Color',[0.6 0.6 0.6],'LineWidth',0.5); plot(r.sig.t,r.sig.lam_true,'Color',col{c},'LineWidth',0.5); grid on; ylim([0 0.6]);
     title(sprintf('%s, estimator Rs = %d %%', ctlname{c}, rsf(j))); if j==1 && c==1, legend('estimated flux (controller sees)','true flux (motor)','Location','east'); end
     if j==3, xlabel('t [s]'); end; ylabel('flux [Wb]');
@@ -44,7 +44,7 @@ save_figure(f,'fig01_flux_estimated_vs_true_mid_speed',fdir); close(f);
 for k = 1:3
     f = newfig(700);
     for c = 1:2, subplot(2,1,c); hold on;
-        for j = 1:3, r = get(tag(c,k,rsf(j))); plot(r.sig.t,r.sig.w,'LineWidth',1.1); end
+        for j = 1:3, r = get_result(tag(c,k,rsf(j))); plot(r.sig.t,r.sig.w,'LineWidth',1.1); end
         yline(cases{k,2},'k--'); grid on; ylabel('\omega [rad/s]'); title(sprintf('%s, speed reference %d rad/s',ctlname{c},cases{k,2}));
         legend('Rs 70 %','Rs 100 %','Rs 130 %','reference','Location','best'); ylim(cases{k,2}+[-30 30]);
     end
@@ -54,7 +54,7 @@ end
 % fig05: pass/fail map
 f = newfig(520); M = zeros(9,2); lab = {}; txt = cell(9,2); n = 0;
 for k = 1:3, for j = 1:3, n = n+1; lab{n} = sprintf('%d rad/s, Rs %d%%',cases{k,2},rsf(j));
-    for c = 1:2, s = get(tag(c,k,rsf(j))).ss; M(n,c) = s.lost_control;
+    for c = 1:2, s = get_result(tag(c,k,rsf(j))).ss; M(n,c) = s.lost_control;
         if s.lost_control, txt{n,c} = 'LOST'; else, txt{n,c} = sprintf('flux %.3f',s.lam_true_mean); end
     end
 end, end
@@ -65,7 +65,7 @@ save_figure(f,'fig05_control_kept_map',fdir); close(f);
 
 % fig06: reversal
 f = newfig(700);
-for c = 1:2, r = get([ctl{c} '_reversal']);
+for c = 1:2, r = get_result([ctl{c} '_reversal']);
     subplot(2,2,c); plot(r.sig.t,r.sig.w,'Color',col{c},'LineWidth',1.2); hold on; grid on; yline(0,'k:'); ylabel('\omega [rad/s]'); title([ctlname{c} ': speed reversal']);
     subplot(2,2,2+c); plot(r.sig.t,r.sig.Te_true,'Color',col{c},'LineWidth',0.4); grid on; ylabel('T_e [N\cdotm]'); xlabel('t [s]'); ylim([-1 3]);
 end

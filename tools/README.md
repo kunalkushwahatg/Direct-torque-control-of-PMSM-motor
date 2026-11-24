@@ -1,6 +1,6 @@
 # Tools
 
-Two small MATLAB helpers used across the experiments.
+Three small MATLAB helpers used across the experiments.
 
 ## `save_figure.m`
 
@@ -23,9 +23,8 @@ save_figure(fig, 'fig01_example', fullfile('experiments', 'exp05_winder_mechanic
 ## `new_experiment.m`
 
 Creates the next numbered experiment folder with the standard `models/`, `scripts/`,
-`results/`, and `figures/` subfolders, plus a starter `README.md`. It copies the
-previous experiment's scripts and models as a starting point and chooses the next free
-number automatically.
+`results/`, and `figures/` subfolders, plus a starter `README.md`. It copies the common analysis scripts and models from the previous experiment and
+chooses the next free number automatically. Model-building scripts are not copied.
 
 ```matlab
 addpath('tools')
@@ -33,16 +32,16 @@ new_experiment('web_tension_observer')
 % -> experiments/exp06_web_tension_observer/
 ```
 
-> [!TIP]
-> The copied files are a snapshot, not a finished experiment. Rename the models and
-> edit the scripts before running anything.
+The copied files are a snapshot, not a finished experiment. Rename the models and
+edit the scripts before running anything. The starter README comes from
+`templates/experiment_readme_template.md`.
 
 `projectRoot` is an optional second argument; leave it out when running from the
 repository root.
 
 ## `export_model_screenshots.m`
 
-Saves full top-level screenshots of every experiment model into
+Saves full top-level screenshots of the canonical experiment models into
 `docs/screenshots/`.
 
 ```matlab

@@ -1,12 +1,12 @@
 %% Mid-semester review report - PMSM Drive using Direct Torque Control
-%% Compile with XeLaTeX (real Times New Roman from ./fonts) - Overleaf: Menu > Compiler > XeLaTeX.
+%% Compile with XeLaTeX (free TeX Gyre Termes, Times-compatible).
 %% If compiled with pdfLaTeX it falls back to a Times-compatible font automatically.
 \documentclass[12pt,a4paper,onecolumn]{IEEEtran}
 
 \usepackage{iftex}
 \ifXeTeX
   \usepackage{fontspec}
-  \setmainfont{times.ttf}[Path=./fonts/, BoldFont=timesbd.ttf, ItalicFont=timesi.ttf, BoldItalicFont=timesbi.ttf]
+  \setmainfont{TeX Gyre Termes}
   \usepackage{amsmath}
   \usepackage{unicode-math}
   \setmathfont{TeX Gyre Termes Math}
@@ -31,6 +31,7 @@
 
 % ---------- clickable references (links open the paper through its DOI) ----------
 \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=blue]{hyperref}
+\hypersetup{pdftitle={PMSM Direct Torque Control: Mid-Semester Report},pdfauthor={Kunal Kushwaha}}
 
 % ---------- small helpers ----------
 \newcommand{\Nm}{\,\mathrm{N\cdot m}}

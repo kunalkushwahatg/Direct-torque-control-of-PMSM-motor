@@ -4,6 +4,9 @@
 root = fileparts(fileparts(mfilename('fullpath'))); cd(root); setup_paths; pmsm_dtc_parameters;
 for mname = {'svm_dtc_rob','classic_dtc_rob'}
     m = mname{1}; load_system(m);
+    if getSimulinkBlockHandle([m '/omega_rev']) > 0
+        error('%s already has robustness hooks; use the exp02 model backups if you need to rebuild.', m);
+    end
     set_param([m '/Constant7'],'Value','Rs*Rs_factor');                       % estimator Rs
     w = [m '/omega_ref']; r = [m '/omega_ref_ramp'];
     pr = get_param(r,'PortHandles'); delete_line(get_param(pr.Inport(1),'Line'));

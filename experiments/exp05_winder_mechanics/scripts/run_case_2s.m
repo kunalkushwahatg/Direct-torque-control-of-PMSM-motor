@@ -118,4 +118,6 @@ fprintf('  speed rmse %.5f  mismatch max %.2e  Te peak %.3f  ripple %.3f\n', ...
     met.speed_rmse, met.mismatch_max, met.Te_peak, met.ripple);
 fprintf('  ia peak %.2f A rms %.2f A  sat %.3f s  balance rms %.2e  wall %.0f s\n', ...
     met.ia_peak, met.ia_rms, met.sat_time, met.bal_rms, wall);
+
+close_system(model,0);
 end

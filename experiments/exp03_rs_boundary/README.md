@@ -1,10 +1,10 @@
-# Experiment 03 — Where exactly does Rs error break the drive?
+# Experiment 03 — Fine-grained Rs boundary
 
-**exp02 showed ±30% is bad. This one walks the boundary in 5–10% steps.**
+Fine Rs sweep at 20 and 5 rad/s, extending the 70/100/130% grid of exp02. Eight estimator-resistance values are evaluated for both controllers.
 
-## At a glance
+## Summary
 
-| | |
+| Item | Detail |
 |---|---|
 | **Question** | How small must the estimator's Rs error be for the drive to keep control? |
 | **What is varied** | Estimator Rs = 70, 80, 90, 100, 105, 110, 120, 130% of true 2.875 Ω |
@@ -16,55 +16,64 @@
 | **Software** | MATLAB R2026a (or compatible), Simulink, Simscape, Simscape Electrical |
 | **Outputs** | 3 figures, `results/metrics_summary.csv`, 20 new `.mat` files |
 
-## The answer in one picture
+## Motivation
 
-<p align="center">
-  <img src="../../docs/diagrams/exp03_boundary.svg" width="85%" alt="Fine Rs boundary map">
-</p>
+- Copper resistance changes by tens of percent between cold and hot, so a 5% estimator error is realistic.
+- In the tested grid, +5% is sufficient for loss of control at 20 rad/s; at 5 rad/s only the exact value survives.
+- Both controllers share the failure, so the corrective mechanism must be in the flux estimator. This map is the benchmark for an improved estimator.
 
-> **Boundary:** at 20 rad/s, +5% is already fatal. At 5 rad/s, even −10% is fatal.
+## Rs boundary
 
-## Words you need
+![Fine Rs boundary map](../../docs/diagrams/exp03_boundary.svg)
 
-| Term | Plain meaning |
-|---|---|
-| **Rs** | Stator resistance — the copper resistance of the motor windings. True value 2.875 Ω. |
-| **Flux** | Magnetic strength in the stator. The controller estimates it because there is no flux sensor. |
-| **Wb** | Weber — the unit of magnetic flux. Nominal value here: 0.175 Wb. |
-| **Rs assumed** | The value the estimator uses, shown as % of the true Rs. 105% = 5% too high. |
-| **rad/s** | Angular speed. 2π rad/s ≈ one revolution per second. |
-| **Boundary** | The smallest Rs error that makes the drive lose control. |
-| **Failure time** | First time the smoothed flux error exceeds 0.03 Wb; an indicator, not the exact instability onset. |
-| **Growth rate** | How fast the flux error grows, in 1/s, fitted from the simulated waveform. |
+*Figure 1. Fine Rs boundary at 20 and 5 rad/s. Filled markers are kept-control cases; crosses are lost-control cases.*
+
+> **Boundary:** at 20 rad/s, +5% causes loss of control; at 5 rad/s, −10% is sufficient.
+
+## Nomenclature
+
+| Symbol / term | Definition | Unit |
+|---|---|---|
+| **Rs** | Stator resistance, true value 2.875 Ω | Ω |
+| **λs** | Stator flux linkage, nominal 0.175 Wb | Wb |
+| **Flux estimator** | Voltage-model integrator using Rs assumed; no flux sensor | — |
+| **Rs assumed** | Estimator resistance as a percentage of true Rs; 105% = 5% high | % |
+| **ω** | Angular speed | rad/s |
+| **Boundary** | Smallest Rs error that causes loss of control | % |
+| **Failure time** | First time the smoothed flux error exceeds 0.03 Wb; an indicator, not the exact instability onset | ms |
+| **Growth rate** | Exponential rate of flux-error growth, in 1/s, fitted from the simulated waveform | 1/s |
 
 ## How Rs error becomes instability
 
-<p align="center">
-  <img src="../../docs/diagrams/exp03_rs_flow.svg" width="60%" alt="How Rs error becomes instability">
-</p>
+![Rs error path](../../docs/diagrams/exp03_rs_flow.svg)
 
-**The hypothesis from exp02:** the flux-error dynamics are approximately
+*Figure 2. Rs error enters through the flux estimator; the plant retains the true resistance.*
+
+The hypothesis from exp02 is that the flux-error dynamics are approximately
 
 ```text
 d(err)/dt = ((Rs_est - Rs) / L) * err + forcing
 ```
 
-Here `L` is the stator inductance (8.5 mH). A positive mismatch (`Rs_est > Rs`) should grow, while a negative mismatch should decay. This experiment tests that idea.
+Here `L` is the stator inductance (8.5 mH). A positive mismatch (`Rs_est > Rs`) should grow, while a negative mismatch should decay. This experiment tests that relation.
 
-**What actually happens:** the sign asymmetry is confirmed, but the simple formula is not quantitatively accurate. See [Was the simple model right?](#was-the-simple-model-right).
+The sign asymmetry is confirmed, but the simple formula is not quantitatively accurate; see [Growth-rate model](#growth-rate-model).
 
-| Direction | 20 rad/s | 5 rad/s | What you see |
+| Direction | 20 rad/s | 5 rad/s | Observed behavior |
 |---|---|---|---|
-| **Rs too low (70–90%)** | ✅ kept control, flux 4–16% low | ❌ lost | bias, then low-speed failure |
-| **Rs correct (100%)** | ✅ 0.175 Wb | ✅ 0.175 Wb | nominal |
-| **Rs too high (105–130%)** | ❌ lost | ❌ lost | runaway |
+| **Rs too low (70–90%)** | kept control, flux 4–16% low | lost control | bias, then low-speed failure |
+| **Rs correct (100%)** | 0.175 Wb | 0.175 Wb | nominal |
+| **Rs too high (105–130%)** | lost control | lost control | runaway |
 
 ## Whole-model screenshots
 
-<p align="center">
-  <img src="../../docs/screenshots/exp03_classic_dtc_rs.png" width="49%" alt="Classical DTC Rs boundary model">
-  <img src="../../docs/screenshots/exp03_svm_dtc_rs.png" width="49%" alt="SVM-DTC Rs boundary model">
-</p>
+![Classical DTC Rs boundary model](../../docs/screenshots/exp03_classic_dtc_rs.png)
+
+*Figure 3a. Classical DTC Rs boundary model.*
+
+![SVM-DTC Rs boundary model](../../docs/screenshots/exp03_svm_dtc_rs.png)
+
+*Figure 3b. SVM-DTC Rs boundary model.*
 
 These are the complete top-level models used for the fine Rs sweep.
 
@@ -124,22 +133,22 @@ A fresh clone may not include the large `.mat` files; regenerate them with `run_
 
 ### Outcome map
 
-`✅` = kept control; the number is true flux mean. `❌` = lost control; the number is the failure time, SVM-DTC / classical DTC. Flux values are from SVM-DTC; classical DTC is within 0.001 Wb.
+For kept-control rows the number is true flux mean. For lost-control rows the number is failure time, SVM-DTC / classical DTC. Flux values are from SVM-DTC; for kept-control rows classical DTC is within 0.001 Wb.
 
 | Rs assumed | 20 rad/s | 5 rad/s |
 |:--:|---|---|
-| **70%** | ✅ 0.147 Wb | ❌ 258 / 257 ms |
-| **80%** | ✅ 0.160 Wb | ❌ 330 / 330 ms |
-| **90%** | ✅ 0.168 Wb | ❌ 425 / 426 ms |
-| **100%** | ✅ 0.175 Wb | ✅ 0.175 Wb |
-| **105%** | ❌ 244 / 245 ms | ❌ 285 / 286 ms |
-| **110%** | ❌ 121 / 121 ms | ❌ 111 / 110 ms |
-| **120%** | ❌ 77 / 75 ms | ❌ 89 / 84 ms |
-| **130%** | ❌ 89 / 78 ms | ❌ 66 / 78 ms |
+| **70%** | kept control, 0.147 Wb | lost control, 258 / 257 ms |
+| **80%** | kept control, 0.160 Wb | lost control, 330 / 330 ms |
+| **90%** | kept control, 0.168 Wb | lost control, 425 / 426 ms |
+| **100%** | kept control, 0.175 Wb | kept control, 0.175 Wb |
+| **105%** | lost control, 244 / 245 ms | lost control, 285 / 286 ms |
+| **110%** | lost control, 121 / 121 ms | lost control, 111 / 110 ms |
+| **120%** | lost control, 77 / 75 ms | lost control, 89 / 84 ms |
+| **130%** | lost control, 89 / 78 ms | lost control, 66 / 78 ms |
 
 Failure time = first time the 2 ms-smoothed `|estimated − true flux|` exceeds 0.03 Wb. It marks when the estimate has clearly gone wrong, not the exact onset of instability.
 
-### Was the simple model right?
+### Growth-rate model
 
 | Rs assumed | Predicted growth k (1/s) | Measured k, SVM / classical (1/s) |
 |---|---:|---:|
@@ -148,34 +157,28 @@ Failure time = first time the 2 ms-smoothed `|estimated − true flux|` exceeds 
 | 120% | 67.6 | 183.7 / 170.6 |
 | 130% | 101.5 | 31.0 / 37.1 |
 
-The measured rates are about 0.3–2.7× the prediction and are not monotonic. At +5% the flux error stays bounded around 0.08 Wb peak, yet speed regulation is still lost. So the qualitative story (positive mismatch is dangerous) holds, but the simple formula ignores the speed ramp and load step.
+The measured rates are about 0.3–2.7× the prediction and are not monotonic. At +5% the flux error stays bounded around 0.08 Wb peak, yet speed regulation is still lost. The qualitative sign asymmetry holds, but the simple formula ignores the speed ramp and load step.
 
 ### Figures
 
 ![True flux vs assumed Rs](figures/fig01_true_flux_vs_assumed_Rs.png)
 
-*True flux vs assumed Rs. At 20 rad/s the kept-control range ends at 100%; at 5 rad/s only 100% is green. The 70–90% points keep control but sit below the 0.175 Wb line.*
+*Figure 4. True flux vs assumed Rs. At 20 rad/s the kept-control range ends at 100%; at 5 rad/s only 100% keeps control. The 70–90% points keep control but sit below the 0.175 Wb line.*
 
 ![Flux error growth](figures/fig03_flux_error_growth_log.png)
 
-*Flux-error magnitude at 20 rad/s on a log scale. Exponential growth would be a straight rising line; the real curves bend and saturate.*
+*Figure 5. Flux-error magnitude at 20 rad/s on a log scale. Exponential growth would be a straight rising line; the measured curves bend and saturate.*
 
 ![Measured vs predicted growth](figures/fig02_growth_rate_measured_vs_predicted.png)
 
-*Measured vs predicted growth rate. Points would lie on the dashed line if the simple formula were exact; they do not.*
+*Figure 6. Measured vs predicted growth rate. Points would lie on the dashed line if the simple formula were exact; they do not.*
 
-## What the data say
+## Discussion
 
-- **Controller-independent.** SVM-DTC and classical DTC have the same pass/fail pattern. Failure times usually agree within 1–2 ms and at worst about 12 ms (20 rad/s/130%: 89 vs 78 ms; 5 rad/s/130%: 66 vs 78 ms). The shared estimator is the weak point, not the modulator.
-- **Sign asymmetry at 20 rad/s.** Underestimates of 10–30% keep control but leave a bias: true flux 0.168, 0.160 and 0.147 Wb at 90, 80 and 70% (4%, 9% and 16% low). Any overestimate of 5% or more loses control.
-- **No tolerance at 5 rad/s.** Every mismatch fails: −30% to −10% and +5% to +30%. Some of these cases still have a near-nominal mean flux (about 0.17 Wb), but the speed criterion is violated. At this speed the larger mismatch usually fails sooner (130% at 66 ms vs 105% at 285 ms).
-- **The formula is only qualitative.** Growth rates differ by factors of about 0.3–2.7, and the +5% case stays bounded yet still loses speed. The failures cluster around the speed ramp (0.05 s) and the load step (0.3 s), which the formula does not model.
-
-## Why it matters
-
-- A 5% resistance error is realistic: copper resistance changes by tens of percent between cold and hot.
-- The drive has almost no margin in the dangerous direction: +5% is enough at 20 rad/s, and at 5 rad/s nothing except the exact value survives.
-- The failure is shared by both controllers, so the fix must be an Rs-robust flux estimator. This map is the benchmark that an improved estimator must beat.
+- **Controller-independent:** SVM-DTC and classical DTC have the same pass/fail pattern. Failure times usually agree within 1–2 ms and at worst about 12 ms (20 rad/s/130%: 89 vs 78 ms; 5 rad/s/130%: 66 vs 78 ms). The shared estimator, not the modulator, determines the outcome.
+- **Sign asymmetry at 20 rad/s:** underestimates of 10–30% keep control but leave a bias. True flux is 0.168, 0.160 and 0.147 Wb at 90, 80 and 70% (4%, 9% and 16% low). Any overestimate of 5% or more loses control.
+- **No tolerance at 5 rad/s:** every mismatch fails: −30% to −10% and +5% to +30%. Some cases still have a near-nominal mean flux (about 0.17 Wb), but the speed criterion is violated. At this speed the larger mismatch usually fails sooner (130% at 66 ms vs 105% at 285 ms).
+- **Model accuracy:** growth rates differ from the prediction by factors of about 0.3–2.7, and the +5% case stays bounded yet still loses speed. The failures cluster around the speed ramp (0.05 s) and the load step (0.3 s), which the formula does not model.
 
 ## Limitations
 
@@ -186,4 +189,16 @@ The measured rates are about 0.3–2.7× the prediction and are not monotonic. A
 - **Mixed sources:** the 70/100/130% rows are reused from exp02, not rerun here (same models and conditions).
 - **Model limitations:** pure voltage-model integrator, ideal inverter with no dead time, inverted current sensors, SPMSM assumption, simulation only.
 
-Next questions: resolve the low-speed boundary with ±1–3% steps, then test an Rs-adaptive flux estimator against this map.
+## References
+
+Reference list and BibTeX keys: [refs.bib](../../reports/final_2026-11/refs.bib).
+
+- Zhong, L., Rahman, M. F., Hu, W. Y., & Lim, K. W. (1997). Analysis of direct torque control in permanent magnet synchronous motor drives. *IEEE Trans. Power Electron.* Key: `zhong1997`.
+- Hu, J., & Wu, B. (1998). New integration algorithms for estimating motor flux over a wide speed range. *IEEE Trans. Power Electron.* Key: `hu1998`.
+- Haque, M. E., & Rahman, M. F. (2000). A PI stator resistance compensator for a direct torque controlled interior permanent magnet synchronous motor drive. *Proc. IEEE IPEMC.* Key: `haque2000`.
+- Kadjoudj, M., Golea, N., & Benbouzid, M. E. H. (2007). Problems of stator flux estimation in DTC of PMSM drives. *J. Elect. Eng. Technol.* Key: `kadjoudj2007`.
+
+## Further work
+
+- Resolve the low-speed boundary with ±1–3% steps.
+- Test an Rs-adaptive flux estimator against this map.

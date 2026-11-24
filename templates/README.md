@@ -1,31 +1,35 @@
 # Templates
 
-The [experiment README template](experiment_README_template.md) is the checklist every
-experiment folder starts from. It keeps reports short and comparable.
+The [experiment README template](experiment_readme_template.md) defines the required
+sections for a new experiment.
 
-## What each section is for
+## Sections
 
-| Section | What to write |
+| Section | Contents |
 |---|---|
-| **Goal** | The question the experiment answers, in one or two sentences. |
-| **What changed vs the previous experiment** | The new model hook, test condition, or metric. |
-| **Models and conditions** | Model files, key parameters, and the test matrix. |
-| **How to reproduce** | The exact commands, in order. |
-| **Results** | The key numbers and units; point to files in `figures/`. |
-| **Conclusions / next steps** | The verdict and what should happen next. |
+| Goal | The question the experiment answers. |
+| What changed | New model hook, test condition, or metric. |
+| Models and conditions | Model files, key parameters, test matrix, sample time, simulation time. |
+| Files | Folder tree and important files. |
+| How to reproduce | Exact commands in order. |
+| Results | Key numbers with units and figure references. |
+| Limitations | Ideal models and cases not covered. |
+| Conclusions / next steps | Verdict and follow-up work. |
 
 ## How to use it
 
-1. Create the experiment folder with `tools/new_experiment.m`, which already writes a
-   starter README, **or** copy the template into the folder as `README.md`.
-2. Fill in **Goal** before running the experiment.
-3. Add the numbers and conclusions after the runs finish.
-4. Replace every placeholder and keep units on every number.
+1. Create the folder with `tools/new_experiment.m`, or copy the template manually.
+2. Fill in the Goal before running the experiment.
+3. Add the numerical results after the runs.
+4. Keep units on every number.
+
+A new experiment should have the standard skeleton:
 
 ```text
 experiments/exp06_my_study/
-└── README.md   ← filled-in copy of the template
+├── models/
+├── scripts/
+├── results/
+├── figures/
+└── README.md
 ```
-
-The template is deliberately short: one page that a reader can scan before opening any
-model or script.

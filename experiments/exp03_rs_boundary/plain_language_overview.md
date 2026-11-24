@@ -1,6 +1,6 @@
 # Experiment 03 explained in simple words
 
-*(Follow-up to Experiment 02. Read `../exp02_robustness/summary_for_beginners.md` first if you have not.)*
+*(Follow-up to Experiment 02. Read `../exp02_robustness/plain_language_overview.md` first if you have not.)*
 
 ## The question
 In Experiment 02 we told the controller that the motor's wire resistance was 30% wrong and it failed. That is a big mistake to test. **How small does the mistake have to be before the controller is safe again?** If a 5% error is already harmful, the controller is far more fragile than it first looked.

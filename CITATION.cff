@@ -6,6 +6,7 @@ authors:
   - name: "PMSM DTC/SVM-DTC Winder Simulation contributors"
 version: "1.0.0"
 date-released: "2026-11-24"
+repository-code: "https://github.com/kunalkushwahatg/Direct-torque-control-of-PMSM-motor"
 license: "MIT"
 abstract: >-
   A MATLAB/Simulink study of classical hysteresis Direct Torque Control (DTC)

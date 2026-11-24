@@ -28,7 +28,9 @@ winder study and reads the motor parameters from `exp03`.
 
 - MATLAB with **Simulink** and **Simscape** (the models use `fl_lib` and
   `nesl_utility` blocks; the PMSM/inverter blocks come from Simscape Electrical).
-- TeX: **XeLaTeX** + **BibTeX** (real Times New Roman from `fonts/`).
+- **Signal Processing Toolbox** is needed by `dtc_metrics.m` and the mid-semester
+  report figure script (`butter`/`filtfilt`/`hann`), not by the final exp05 matrix.
+- TeX: **XeLaTeX** + **BibTeX** with **TeX Gyre Termes** (free Times-compatible font).
 - Keep the project path short. Windows' 260-character limit breaks Simulink
   code generation in deep folders.
 - `setup_paths` (exp01–exp03) sends Simulink's cache to `%TEMP%\dtc_sim_cache`.
@@ -36,12 +38,12 @@ winder study and reads the motor parameters from `exp03`.
 Check the MATLAB side once:
 
 ```matlab
-ver Simulink
-ver Simscape
-ver Simscape_Electrical
+ver('Simulink')
+ver('Simscape')
+ver('Simscape Electrical')
 ```
 
-If `ver Simscape_Electrical` returns nothing, the drive models will not open.
+If `ver('Simscape Electrical')` returns nothing, the drive models will not open.
 
 ---
 
@@ -54,13 +56,16 @@ Use this when only the text, layout, or existing saved data changed.
 The raw `.mat` results are not committed. If they exist locally:
 
 ```matlab
+cd('experiments/exp05_winder_mechanics')
+run('scripts/make_summary_figures.m')     % FF summary bar chart
+
 cd('reports/final_2026-11')
-run('make_overlay_3panel.m')      % report 3-panel overlay
+run('scripts/update_report_figures.m')    % copy case figures + rebuild overlay
 ```
 
 The figures already included in `reports/final_2026-11/figures/` are part of the
 repository. To recreate them from scratch, first run the exp05 matrix, then run
-`make_overlay_3panel.m`.
+`scripts/update_report_figures.m`.
 
 ### 2.2 Build the report
 
@@ -77,7 +82,7 @@ Output: `reports/final_2026-11/main.pdf` (14 pages).
 If Perl is installed and you prefer one command:
 
 ```powershell
-latexmk -pdf main.tex
+latexmk main.tex
 ```
 
 The `latexmkrc` already selects XeLaTeX.
@@ -86,7 +91,7 @@ The `latexmkrc` already selects XeLaTeX.
 
 ## 3. Full simulation — what to run and what it produces
 
-### 3.1 exp05 — the main 18-case winder matrix (about 57 minutes measured)
+### 3.1 exp05 — the main 18-case winder matrix (about 1–1.5 h)
 
 ```matlab
 cd('experiments/exp05_winder_mechanics')
@@ -100,7 +105,7 @@ It runs, with identical mechanics/controllers/limits:
 - 4 initial-radius cases: winding r0 = 0.08 m, unwinding r0 = 0.10 m;
 - 2 tension-step cases: 15 → 18 N at 1.2 s, both controllers.
 
-Measured wall time of the saved matrix: **3397 s ≈ 57 min** (139–279 s per case).
+Measured wall time of the saved matrix: **about 1–1.5 h** (roughly 3–5 min per case after the first compile).
 With a cold Simulink cache, budget 1–1.5 h.
 
 Produces:
@@ -277,11 +282,11 @@ The filename tells you the case.
 
 | Figure | Producer |
 |---|---|
-| `fig_classic_wind.png`, `fig_svm_wind.png` (report) | generated from the saved exp05 results |
-| `fig_overlay_3panel.png` (report) | `reports/final_2026-11/make_overlay_3panel.m` |
+| `fig_classic_wind.png`, `fig_svm_wind.png`, `fig_classic_unwind.png`, `fig_svm_unwind.png` (report) | `reports/final_2026-11/scripts/update_report_figures.m` |
+| `fig_overlay_3panel.png` (report) | `reports/final_2026-11/scripts/make_overlay_3panel.m` |
 | `fig_case_<tag>.png/.pdf/.fig` | `run_case_2s` (during a run) |
-| `fig_summary_ff.png`, `fig_svm_unwind.png`, `fig_classic_unwind.png` | copied from the corresponding exp05 six-panel/ff figures; the repo has no single regeneration script for these |
-| `fig_plant_validation*.png` | `validate_winder.m` |
+| `fig_summary_ff.png` | `experiments/exp05_winder_mechanics/scripts/make_summary_figures.m` |
+| `fig_winding_validation.png`, `fig_unwinding_validation.png` | `validate_winder.m` |
 
 After regenerating, rebuild the PDF(s). LaTeX reads the PNGs at compile time, so
 a figure change alone requires a `xelatex` / `pdflatex` run.
@@ -309,7 +314,8 @@ pressing Run on a modified model.
 Do **not** run these unless you intend to rewrite the `.slx` files:
 
 - `build_drive_native.m` (rebuilds the drive model and saves it),
-- `add_feedforward.m`, `add_startup_and_filter.m` (modify and save the model),
+- `add_feedforward.m`, `add_startup_and_filter.m`, `add_tension_control.m` (modify and save the model),
+- `build_robustness.m` (modifies and saves the exp02 models; not idempotent),
 - `build_winder_model.m` (deletes and rebuilds `models/winder_mechanics.slx`).
 
 Back up `models/` before any of them.
@@ -328,7 +334,7 @@ Back up `models/` before any of them.
 | `run_all` does nothing | It resumes; delete the relevant `results/result_*.mat` to force rerun |
 | Matrix rerun seems to reuse old data | Each case overwrites `val2s_<tag>.mat`; check the tag and the timestamp |
 | Report has `??` references | Run the full xelatex → bibtex → xelatex → xelatex sequence |
-| XeLaTeX cannot find Times New Roman | Use XeLaTeX, not pdfLaTeX; the fonts are in `reports/final_2026-11/fonts` |
+| XeLaTeX cannot find TeX Gyre Termes | Install the `tex-gyre` package; the math font is in `reports/final_2026-11/fonts` |
 | MiKTeX prints “major issue: … updates” | It is a warning; check the final “Output written” line |
 | Report is not 14 pages | Check the `\ifextras` switch and the figure includes |
 

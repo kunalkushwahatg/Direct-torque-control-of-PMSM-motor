@@ -52,16 +52,12 @@ Thumbs.db
 # Copyrighted source papers and unrelated local files
 # -----------------------------------------------------------------------------
 literature/
-reports/midsem_2026-10/IDM_*
-reports/midsem_2026-10/*.zip
-archive/**/*.zip
 
 # -----------------------------------------------------------------------------
 # Generated caches and duplicate local exports
 # -----------------------------------------------------------------------------
-archive/_generated_cache/
-templates/Sample.pdf
 
 # Local-only files (not part of the public repository)
 *.pptx
 *.ppt
+reports/*/fonts/*.ttf

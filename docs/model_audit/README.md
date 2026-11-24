@@ -9,11 +9,11 @@ This audit concentrates on the parameters that actually change the model's behav
 
 | File | Contents |
 |---|---|
-| `block_audit_classic_clean_important_params.csv` | 155 rows: curated high-impact parameters, plus the parameter-file and runtime values |
-| `block_audit_classic_clean_key_values.csv` | 268 records: the important block values, with the expression and resolved number |
-| `block_audit_classic_clean_all_params.csv` | 4,553 records: every dialog parameter of the 264 user-level/custom blocks, including defaults |
-| `block_audit_classic_clean_all_blocks.csv` | All 1,048 block paths: 247 user-level blocks + 801 standard library internals |
-| `block_audit_classic_clean_matlab_functions.txt` | Full source of the two MATLAB Function blocks and the `dtc_estimator` chart |
+| `classic_dtc_winder_clean_important_params.csv` | 155 rows: curated high-impact parameters, plus the parameter-file and runtime values |
+| `classic_dtc_winder_clean_key_values.csv` | 268 records: the important block values, with the expression and resolved number |
+| `classic_dtc_winder_clean_all_params.csv` | 4,553 records: every dialog parameter of the 264 user-level/custom blocks, including defaults |
+| `classic_dtc_winder_clean_all_blocks.csv` | All 1,048 block paths: 247 user-level blocks + 801 standard library internals |
+| `classic_dtc_winder_clean_matlab_functions.txt` | Full source of the two MATLAB Function blocks and the `dtc_estimator` chart |
 
 ---
 
@@ -343,7 +343,7 @@ This is the classical DTC switching-table core. The hysteresis bands are the mai
 
 #### `dtc_estimator` — flux and torque estimator
 
-Full source is in `block_audit_classic_clean_matlab_functions.txt`. Key lines:
+Full source is in `classic_dtc_winder_clean_matlab_functions.txt`. Key lines:
 
 ```matlab
 persistent lam_a lam_b

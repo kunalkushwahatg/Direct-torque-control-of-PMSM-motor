@@ -1,6 +1,6 @@
 # Experiment 02 results in simple words
 
-*(Read `summary_for_beginners.md` first for what the experiment is. Numbers come from `results/metrics_summary.csv`; pictures are in `figures/`.)*
+*(Read `plain_language_overview.md` first for what the experiment is. Numbers come from `results/metrics_summary.csv`; pictures are in `figures/`.)*
 
 ## The one-sentence answer
 **When the controller is told the wrong electrical resistance, both controllers can lose control completely, and they fail in almost exactly the same places.** The smoother controller (SVM-DTC) is not more fragile than the classical one, but it is not safer either. The weak point is the part they share: the "fuel gauge" that calculates the motor's magnetic strength (flux).

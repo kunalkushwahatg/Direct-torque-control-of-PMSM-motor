@@ -1,7 +1,11 @@
 # Model screenshots
 
-These are top-level screenshots of the actual Simulink models in the repository.
-They show the complete model, not a subsystem or a cropped view.
+These are top-level screenshots of the canonical Simulink models used in the experiments.
+They show the complete model, not a subsystem or a cropped view. Readability copies
+(`*_clean.slx`) are not included; unused intermediate wrappers were removed.
+
+Note: exp02 and exp03 reuse the same drive model; only the test matrix differs, so
+their model screenshots are intentionally identical.
 
 | Experiment | Model | Screenshot |
 |---|---|---|

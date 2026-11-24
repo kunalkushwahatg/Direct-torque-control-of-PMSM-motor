@@ -1,8 +1,9 @@
 % Three-panel overlay: tension, torque, surface-speed mismatch.
 here = fileparts(mfilename('fullpath'));
-repo_root = fileparts(fileparts(here));
+report_dir = fileparts(here);
+repo_root = fileparts(fileparts(report_dir));
 exp_root = fullfile(repo_root,'experiments','exp05_winder_mechanics');
-outdir = fullfile(here,'figures');
+outdir = fullfile(report_dir,'figures');
 C = load(fullfile(exp_root,'results','val2s_Classical_wind_ff1.mat'));
 S = load(fullfile(exp_root,'results','val2s_SVM_wind_ff1.mat'));
 blue = [0.00 0.45 0.74];

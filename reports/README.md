@@ -1,7 +1,7 @@
 # Reports
 
-The written report is the only part of this project treated as public documentation. The
-two PDFs below are the reading copies.
+The written reports are the formal deliverables. The repository also documents how to
+reproduce them; the two PDFs below are the reading copies.
 
 | Report | Period | PDF |
 |---|---|---|

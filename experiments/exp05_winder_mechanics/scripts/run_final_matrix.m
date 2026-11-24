@@ -53,33 +53,34 @@ end
 %% D. tension-reference step 15 -> 18 N at 1.2 s (winding, full FF)
 for c = [1 3]
     m = cfgs{c,1};
-    load_system(m);
+    tmpdir = tempname; mkdir(tmpdir); addpath(tmpdir);
+    tmpmodel = [m '_fstep_tmp'];
+    cleanupObj = onCleanup(@() cleanup_fstep(tmpdir, tmpmodel));
+    copyfile(fullfile(exp_root,'models',[m '.slx']), fullfile(tmpdir,[tmpmodel '.slx']));
+    load_system(fullfile(tmpdir,[tmpmodel '.slx']));
+
     % replace F_ref_set by a Step feeding the same destinations
-    ph = get_param([m '/F_ref_set'],'PortHandles');
+    ph = get_param([tmpmodel '/F_ref_set'],'PortHandles');
     l  = get_param(ph.Outport(1),'Line');
     db = get_param(l,'DstBlockHandle'); dp = get_param(l,'DstPortHandle');
     dst = {};
     for q=1:numel(db), dst{end+1} = {get_param(db(q),'Name'), get_param(dp(q),'PortNumber')}; end %#ok<SAGROW>
     delete_line(l);
-    if getSimulinkBlockHandle([m '/F_step']) < 0
-        add_block('simulink/Sources/Step',[m '/F_step'], ...
-            'Position',[760 940 800 970], ...
-            'Time','1.2','Before','15','After','18');
-    end
+    add_block('simulink/Sources/Step',[tmpmodel '/F_step'], ...
+        'Position',[760 940 800 970], ...
+        'Time','1.2','Before','15','After','18');
     for q=1:numel(dst)
-        add_line(m,'F_step/1',[dst{q}{1} '/' num2str(dst{q}{2})],'autorouting','on');
+        add_line(tmpmodel,'F_step/1',[dst{q}{1} '/' num2str(dst{q}{2})],'autorouting','on');
     end
+
     tag = sprintf('%s_wind_Fstep_ff1', cfgs{c,2});
-    met = run_case_2s(m, 1, 0.06, tag, 1, 1);
+    met = run_case_2s(tmpmodel, 1, 0.06, tag, 1, 1);
     rows(end+1,:) = {tag, cfgs{c,2}, 'wind', 1, met.F_rmse, met.F_max, ...
         met.F_min, met.F_mean_ss, met.overshoot, met.speed_rmse, ...
         met.mismatch_max, met.Te_peak, met.ripple, met.ia_peak, met.ia_rms, ...
         met.sat_time, met.bal_rms, met.r0_act, met.r_end, met.J0, met.J_end, met.wall}; %#ok<SAGROW>
-    % restore
-    for q=1:numel(dst), l2 = get_param([m '/' dst{q}{1}],'PortHandles'); ll = get_param(l2.Inport(dst{q}{2}),'Line'); if ll>0, delete_line(ll); end; end
-    delete_block([m '/F_step']);
-    add_line(m,'F_ref_set/1','Tension Control/5','autorouting','on');
-    add_line(m,'F_ref_set/1','FF_Mux/2','autorouting','on');
+    close_system(tmpmodel,0);
+    clear cleanupObj;
 end
 
 %% save
@@ -90,6 +91,12 @@ T = cell2table(rows,'VariableNames',{'tag','controller','direction','ff', ...
 writetable(T, fullfile(exp_root,'results','final_matrix.csv'));
 save(fullfile(exp_root,'results','final_matrix.mat'),'T');
 disp(T(:,{'tag','controller','direction','ff','F_rmse','F_max','F_min','speed_rmse','ia_peak','sat_time'}));
+
+function cleanup_fstep(tmpdir,tmpmodel)
+    if bdIsLoaded(tmpmodel), close_system(tmpmodel,0); end
+    if contains(path,tmpdir), rmpath(tmpdir); end
+    if exist(tmpdir,'dir'), rmdir(tmpdir,'s'); end
+end
 
 function s = ternary(cond,a,b)
     if cond, s = a; else, s = b; end

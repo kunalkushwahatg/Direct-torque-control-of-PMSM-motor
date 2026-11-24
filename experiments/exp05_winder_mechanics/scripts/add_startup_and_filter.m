@@ -54,7 +54,7 @@ add_block('simulink/Math Operations/Gain',[m '/lpf_gain'], ...
 add_block('simulink/Continuous/Integrator',[m '/lpf_int'], ...
     'Position',[730 850 770 880],'InitialCondition','F0');
 add_block('simulink/Signal Routing/Switch',[m '/filt_sel'], ...
-    'Position',[810 870 840 920],'Criteria','u2 > Threshold','Threshold','0.5');
+    'Position',[810 870 840 920],'Criteria','u2 < Threshold','Threshold','0.5');
 add_block('simulink/Sources/Constant',[m '/filt_on'], ...
     'Position',[600 930 640 960],'Value','filt_on');
 
@@ -62,8 +62,8 @@ connect(m,'Winder Plant/1','lpf_sum',1);
 connect(m,'lpf_int/1','lpf_sum',2);
 connect(m,'lpf_sum/1','lpf_gain',1);
 connect(m,'lpf_gain/1','lpf_int',1);
-connect(m,'Winder Plant/1','filt_sel',1);
-connect(m,'lpf_int/1','filt_sel',3);
+connect(m,'Winder Plant/1','filt_sel',3);
+connect(m,'lpf_int/1','filt_sel',1);
 connect(m,'filt_on/1','filt_sel',2);
 connect(m,'filt_sel/1','Tension Control',1);
 

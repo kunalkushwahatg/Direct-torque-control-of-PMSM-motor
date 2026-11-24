@@ -48,7 +48,7 @@
     <rect x="180" y="711" width="540" height="72" fill="#ffffff" stroke="#111111" stroke-width="2"/>
     <g text-anchor="middle" font-size="20">
       <text x="450.0" y="741.5">Save results</text>
-      <text x="450.0" y="766.5">val2s_tag.mat + fig2s_tag.png/.pdf</text>
+      <text x="450.0" y="766.5">val2s_tag.mat + fig_case_tag.png/.pdf</text>
     </g>
     <line x1="450" y1="783" x2="450" y2="809" stroke="#111111" stroke-width="2" marker-end="url(#arrow)"/>
     <rect x="180" y="809" width="540" height="72" fill="#ffffff" stroke="#111111" stroke-width="2"/>

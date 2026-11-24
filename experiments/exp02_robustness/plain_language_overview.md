@@ -46,4 +46,4 @@ When we told the SVM-DTC controller that the resistance was 30% too high, at 5 r
 A paper that only shows "my controller is smooth in perfect conditions" is not convincing. A paper that shows **where the controller breaks and how to fix it** is a real contribution. This experiment finds the breaking points; the next step is to pick one of them and design a fix.
 
 ## 8. Results
-See `results_in_simple_words.md` for what happened. In one line: both controllers lose control when the assumed resistance is 30% too high, and the slow cases fail even at 30% too low.
+See `plain_language_results.md` for what happened. In one line: both controllers lose control when the assumed resistance is 30% too high, and the slow cases fail even at 30% too low.

@@ -1,0 +1,27 @@
+# Third-party assets and licence scope
+
+This repository contains code, documentation, simulation results, and report sources
+for a PMSM DTC/SVM-DTC winder study.
+
+## Software
+
+The MATLAB/Simulink code is released under the MIT License; see `LICENSE`.
+
+## Report text and figures
+
+The report PDFs, LaTeX sources, and original figures are part of the academic work.
+Reuse of report text or figures should cite the report and the repository.
+
+## Fonts
+
+The report sources use **TeX Gyre Termes**, a free Times-compatible font, and
+`texgyretermes-math.otf` for mathematics. These fonts are distributed under the
+GUST Font License; see the TeX distribution for details.
+
+Proprietary Microsoft Times New Roman font files are **not** redistributed in this
+repository.
+
+## Institute logo
+
+`reports/*/figures/nitrkl.jpg` is included only for the report cover. It remains the
+property of its owner and is not covered by the MIT software licence.

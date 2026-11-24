@@ -13,8 +13,12 @@ built to be used as the application plant for the existing PMSM DTC / SVM-DTC dr
 It is an extension of the existing work: no controller, estimator or modulation
 block was changed.
 
-The plant is one Level-2 MATLAB S-function (`scripts/winder_plant_sfun.m`) wrapped in
-a subsystem, so the diagram is readable and the equations live in one file.
+The standalone verification model (`models/winder_mechanics.slx`) is one Level-2
+MATLAB S-function (`scripts/winder_plant_sfun.m`) wrapped in a subsystem, so the
+diagram is readable and the equations live in one file. That S-function implements
+a pure-spring web. The final drive models (`models/svm_dtc_winder.slx`,
+`models/classic_dtc_winder.slx`) use a native Kelvin–Voigt plant with
+`C_web = 500 N·s/m`; see §16.
 
 ## 2. Physical model and sign conventions
 
@@ -84,7 +88,7 @@ industry-standard.
 models/winder_mechanics.slx
 ├── Line speed (ramp) -> v_sat -> v_line
 ├── Tension ref, Mode
-├── Winder Plant            (S-function: r, H, F states)
+├── Winder Plant            (S-function, pure spring: r, H, F states)
 │     inputs : Te, v_line, mode
 │     outputs: F, r, J, TL, omega, v_surf, m
 ├── Virtual Drive           (validation only: speed PI + tension draw trim)
@@ -93,6 +97,9 @@ models/winder_mechanics.slx
 
 The **Virtual Drive** exists only to exercise the plant in stand-alone validation.
 It is not part of the deliverable controller.
+
+This section describes the standalone pre-damping verification model. The drive
+models used for the final results embed the native Kelvin–Voigt plant (§7.1, §16).
 
 ## 5. How to reproduce
 
@@ -107,7 +114,13 @@ build_winder_model
 run('scripts/validate_winder.m')
 ```
 
-## 6. Validation results
+## 6. Standalone pre-damping verification (linear ramp)
+
+This section verifies the standalone `models/winder_mechanics.slx` model and its
+pure-spring S-function plant (`C_web = 0`). The final drive models use the native
+Kelvin–Voigt plant with `C_web = 500 N·s/m`; the residuals and figures below
+therefore characterize the pre-damping plant, not the plant used for the final
+results.
 
 Two cases, 20 s each, variable-step solver (`VariableStepAuto`, RelTol 1e-4,
 MaxStep 1e-3). The S-function uses continuous states.
@@ -361,6 +374,10 @@ recovery time, torque ripple, current) is therefore **not** reported as final.
 
 ## 9. Startup ramp and feedback filter
 
+> **Correction (2026-11-24):** the `filt_sel` switch wiring was corrected so that
+> `filt_on = 1` selects the filtered tension. Results earlier in this log were
+> produced before that correction; the final 18-case matrix uses filtered feedback.
+
 ### 9.1 Changes
 
 - `v_line` now ramps 0 → 1.2 m/s with `T_ramp` (default 1.0 s), identical for
@@ -403,6 +420,10 @@ acceleration term. A slower ramp (2–3 s) would also work but only hides the
 underlying tracking lag.
 
 ## 10. Acceleration / inertia feedforward
+
+> **Correction (2026-11-24):** `Tff_extra` now uses `u(2) = F_ref_set` for the web
+> tension term instead of the global `F_ref`. The two tension-step cases were re-run
+> with the corrected feedforward.
 
 ### 10.1 Diagnosis (before modifying)
 
@@ -1010,7 +1031,9 @@ and lifts the worst dip by ~0.5 N.
 
 All cases use the S-curve, Kelvin–Voigt web, 2 s duration, `MaxStep = 5e-6`.
 Results are written to `results/final_matrix.csv` and `.mat`; figures to
-`figures/fig_case_*.png`.
+`figures/fig_case_*.png`. Figure names use the `fig_case_` prefix, and the case
+tag is lowercased with periods removed (`SVM_wind_v0.8_ff1` becomes
+`fig_case_svm_wind_v08_ff1`).
 
 ## 19. Literature comparison and contribution
 
@@ -1071,32 +1094,32 @@ damping) on an integrated DTC winder bench.
 
 | configuration | F RMSE | F min | F max | speed RMSE | Te ripple | ia peak |
 |---|---|---|---|---|---|---|
-| SVM wind, FF off | 6.215 N | 0.00 | 22.72 | 0.0161 | 0.075 | 1.40 A |
-| SVM wind, FF on | 0.772 N | 10.01 | 17.29 | 0.0148 | 0.075 | 1.22 A |
-| SVM unwind, FF off | 2.621 N | 0.00 | 16.79 | 0.00808 | 0.019 | 1.85 A |
-| SVM unwind, FF on | **0.052 N** | 8.84 | 17.38 | **0.000343** | **0.019** | 1.72 A |
-| Classical wind, FF off | 6.236 N | 0.00 | 22.06 | 0.00429 | 0.420 | 2.16 A |
-| Classical wind, FF on | **0.267 N** | 14.03 | 15.92 | 0.00373 | 0.420 | 1.98 A |
-| Classical unwind, FF off | 2.296 N | 0.00 | 16.75 | 0.00692 | 0.417 | 2.68 A |
-| Classical unwind, FF on | 0.100 N | 13.43 | 16.75 | 0.000676 | 0.414 | 2.55 A |
+| SVM wind, FF off | 7.153 N | 0.00 | 23.43 | 0.01418 | 0.074 | 1.47 A |
+| SVM wind, FF on | 0.794 N | 10.03 | 17.19 | 0.01470 | 0.072 | 1.22 A |
+| SVM unwind, FF off | 2.784 N | 0.00 | 16.96 | 0.00852 | 0.249 | 1.88 A |
+| SVM unwind, FF on | 0.052 N | 8.82 | 17.39 | 0.00033 | 0.019 | 1.72 A |
+| Classical wind, FF off | 7.302 N | 0.00 | 23.29 | 0.00410 | 0.421 | 2.25 A |
+| Classical wind, FF on | 0.319 N | 13.98 | 16.21 | 0.00381 | 0.418 | 1.98 A |
+| Classical unwind, FF off | 2.464 N | 0.00 | 16.92 | 0.00747 | 0.469 | 2.67 A |
+| Classical unwind, FF on | 0.114 N | 12.91 | 16.04 | 0.00069 | 0.414 | 2.57 A |
 
-Feedforward reduces tension RMSE by 88–98 % in all four cases and removes
+Feedforward reduces tension RMSE by 89–98 % in all four cases and removes
 startup slack. No case saturates torque (all `sat_time = 0`).
 
 ### 21.2 Robustness
 
 | case | F RMSE | F min | F max | ia peak | sat |
 |---|---|---|---|---|---|
-| SVM wind, v = 0.8 m/s | 0.439 N | 10.33 | 18.08 | 1.16 A | 0 |
-| Classical wind, v = 0.8 | 0.258 N | 14.10 | 15.84 | 1.91 A | 0 |
-| SVM wind, v = 1.6 | 0.670 N | 9.92 | 16.76 | 1.36 A | 0 |
-| Classical wind, v = 1.6 | 0.313 N | 13.90 | 16.04 | 2.06 A | 0 |
-| SVM wind, r0 = 0.08 | 0.636 N | 10.06 | 17.26 | 1.64 A | 0 |
-| Classical wind, r0 = 0.08 | 0.225 N | 14.22 | 15.72 | 2.43 A | 0 |
-| SVM unwind, r0 = 0.10 | 0.371 N | 9.70 | 18.20 | 1.49 A | 0 |
-| Classical unwind, r0 = 0.10 | 0.111 N | 13.51 | 16.95 | 2.35 A | 0 |
-| SVM wind, F step 15→18 N | 1.966 N | 10.01 | 18.65 | 1.22 A | 0 |
-| Classical wind, F step | 1.833 N | 14.03 | 18.24 | 1.98 A | 0 |
+| SVM wind, v = 0.8 m/s | 0.473 N | 10.22 | 17.96 | 1.15 A | 0 |
+| Classical wind, v = 0.8 | 0.266 N | 14.14 | 15.80 | 1.89 A | 0 |
+| SVM wind, v = 1.6 | 0.710 N | 9.74 | 16.59 | 1.36 A | 0 |
+| Classical wind, v = 1.6 | 0.355 N | 13.85 | 16.06 | 2.04 A | 0 |
+| SVM wind, r0 = 0.08 | 0.647 N | 10.06 | 17.21 | 1.63 A | 0 |
+| Classical wind, r0 = 0.08 | 0.240 N | 14.02 | 15.77 | 2.43 A | 0 |
+| SVM unwind, r0 = 0.10 | 0.369 N | 9.70 | 18.21 | 1.49 A | 0 |
+| Classical unwind, r0 = 0.10 | 0.118 N | 13.07 | 17.02 | 2.35 A | 0 |
+| SVM wind, F step 15→18 N | 3.456 N | 10.03 | 19.46 | 1.24 A | 0 |
+| Classical wind, F step | 3.304 N | 13.98 | 19.00 | 1.99 A | 0 |
 
 All robustness cases remain stable, unsaturated and free of sustained slack.
 The tension-step RMSE includes the step transient in the 1.3–2.0 s window and
@@ -1106,12 +1129,12 @@ should not be compared directly with the steady cases.
 
 1. **Feedforward is the dominant improvement.** With the corrected torque port
    and the inertia + tension + friction feedforward, tension RMSE drops by
-   88–98 % and startup slack disappears in both drives and both directions.
+   89–98 % and startup slack disappears in both drives and both directions.
 2. **Controller trade-off is now quantified.** Classical DTC + FF gives the
-   tightest tension band (wind 14.0–15.9 N, unwind 13.4–16.7 N) and the best
-   speed tracking, but ~5× the torque ripple (0.42 vs 0.02–0.08 N·m) and higher
-   peak current (2.0–2.5 A vs 1.2–1.7 A). SVM-DTC is much smoother and draws
-   less current.
+   tightest winding band (13.98–16.21 N), while SVM-DTC + FF is tighter in
+   unwinding (0.052 N vs 0.114 N RMSE). Classical DTC has about 6× the winding
+   torque ripple (0.42 vs 0.019–0.072 N·m) and higher peak current
+   (1.98–2.57 A vs 1.22–1.72 A). SVM-DTC is much smoother and draws less current.
 3. **The SVM winding resonance was a real plant/control interaction**, mitigated
    by physically justified Kelvin–Voigt web damping (C = 500 N·s/m, ζ ≈ 0.3) and
    the S-curve reference. The residual winding dips are bounded (~10 N) and no
@@ -1135,7 +1158,7 @@ should not be compared directly with the steady cases.
 - The 2 Hz feedback filter and the original speed-loop gains were kept; a
   plant-specific retune was not attempted, to preserve comparability.
 
-## 8. Assumptions and limitations
+## 22. Assumptions and limitations
 
 - Constant web thickness, no slip between web and roll.
 - Lumped elastic web (single spring); no transport delay, no web mass, no roller

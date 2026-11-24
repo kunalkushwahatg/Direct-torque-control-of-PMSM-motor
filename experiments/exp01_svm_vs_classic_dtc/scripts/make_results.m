@@ -12,8 +12,8 @@ for i = 1:numel(files)
     tmp = load(fullfile(rdir,files(i).name),'r');
     R.(matlab.lang.makeValidName(erase(erase(files(i).name,'result_'),'.mat'))) = tmp.r;
 end
-get = @(tag) R.(matlab.lang.makeValidName(tag));
-C = get('cl_dyn'); S = get('svm_dyn');
+get_result = @(tag) R.(matlab.lang.makeValidName(tag));
+C = get_result('cl_dyn'); S = get_result('svm_dyn');
 speeds = [10 30 60]; loads = [0.5 4];
 
 %% 1) tables
@@ -42,7 +42,7 @@ fprintf('\n=== SWEEP: true torque ripple RMS [N.m] / THD20k [%%] / flux ripple p
 fprintf('%-8s %-8s | %-26s | %-26s\n','w[rad/s]','TL[N.m]','Classical DTC','SVM-DTC');
 lab = {}; Cm = []; Sm = [];
 for w = speeds, for TL = loads
-    c = get(sprintf('cl_w%d_T%g',w,TL)).ss; s = get(sprintf('svm_w%d_T%g',w,TL)).ss;
+    c = get_result(sprintf('cl_w%d_T%g',w,TL)).ss; s = get_result(sprintf('svm_w%d_T%g',w,TL)).ss;
     fprintf('%-8d %-8g | %7.4f / %6.2f / %5.2f | %7.4f / %6.2f / %5.2f\n', w, TL, ...
         c.Te_true_rms, c.THD_20k, 1e3*c.lam_pk2pk, s.Te_true_rms, s.THD_20k, 1e3*s.lam_pk2pk);
     lab{end+1} = sprintf('%d rad/s, %g N\\cdotm',w,TL); %#ok<SAGROW>
