@@ -109,7 +109,7 @@ These are the complete top-level models: drive, estimator, controller, winder pl
 ## 5. What happens in one simulation run
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Helvetica, Arial, sans-serif'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 28, 'rankSpacing': 35}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1px !important; }'}}%%
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Arial, Helvetica, sans-serif', 'fontSize': '18px'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 40, 'rankSpacing': 50, 'padding': 12}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1.5px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1.5px !important; } .nodeLabel { font-size: 18px !important; } .edgeLabel { font-size: 16px !important; }'}}%%
 flowchart TD
     A(["Start in MATLAB<br/>repository root"]) --> B["Load parameters<br/>pmsm_dtc_parameters.m<br/>winder_params.m"]
     B --> C["Choose the case<br/>model · mode · r0 · tag · FF"]

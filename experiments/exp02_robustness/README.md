@@ -47,7 +47,7 @@ If `Rs_est` is wrong, the subtracted drop is wrong, and the flux estimate drifts
 ## How Rs error enters the drive
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Helvetica, Arial, sans-serif'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 28, 'rankSpacing': 35}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1px !important; }'}}%%
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Arial, Helvetica, sans-serif', 'fontSize': '18px'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 40, 'rankSpacing': 50, 'padding': 12}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1.5px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1.5px !important; } .nodeLabel { font-size: 18px !important; } .edgeLabel { font-size: 16px !important; }'}}%%
 flowchart LR
     subgraph LOOP["Closed-loop drive"]
         REF["Speed reference<br/>20 / 5 / 2 rad/s"] --> PI["Speed PI"]
@@ -84,20 +84,12 @@ Both models are the exp01 drives with two added hooks: an estimator Rs multiplie
 ## The boundary found here
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Helvetica, Arial, sans-serif'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 28, 'rankSpacing': 35}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1px !important; }'}}%%
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Arial, Helvetica, sans-serif', 'fontSize': '18px'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 40, 'rankSpacing': 50, 'padding': 12}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1.5px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1.5px !important; } .nodeLabel { font-size: 18px !important; } .edgeLabel { font-size: 16px !important; }'}}%%
 flowchart TB
-    subgraph S20["20 rad/s"]
-        direction LR
-        A1["Rs 70%<br/>0.147 Wb"] --- A2["Rs 100%<br/>0.175 Wb"] --- A3["Rs 130%<br/>lost"]
-    end
-    subgraph S5["5 rad/s"]
-        direction LR
-        B1["Rs 70%<br/>lost"] --- B2["Rs 100%<br/>0.175 Wb"] --- B3["Rs 130%<br/>lost"]
-    end
-    subgraph S2["2 rad/s"]
-        direction LR
-        C1["Rs 70%<br/>lost"] --- C2["Rs 100%<br/>0.175 Wb"] --- C3["Rs 130%<br/>lost"]
-    end
+    A["Rs error"] --> B["Flux estimator uses<br/>the wrong resistive drop"]
+    B --> C["Estimated flux drifts"]
+    C --> D["Controller corrects<br/>an error that is not real"]
+    D --> E["Speed control lost"]
 ```
 
 **In words:** at 20 rad/s the drive tolerates a 30% underestimate but not a 30% overestimate. At 5 and 2 rad/s it tolerates only the correct value. This is a coarse boundary; exp03 resolves it in smaller steps.

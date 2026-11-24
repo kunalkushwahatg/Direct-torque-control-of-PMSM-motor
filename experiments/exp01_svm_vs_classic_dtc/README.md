@@ -38,27 +38,15 @@
 ## Signal flow
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Helvetica, Arial, sans-serif'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 28, 'rankSpacing': 35}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1px !important; }'}}%%
-flowchart LR
-    REF["Speed reference"] --> PI["Speed PI<br/>Kp = 2, Ki = 150"]
-    PI --> TREF["Torque reference"]
-    subgraph CLASSIC["Classical DTC"]
-        C1["Hysteresis comparators<br/>+ switching table"]
-    end
-    subgraph SVM["SVM-DTC"]
-        C2["Torque/flux PI<br/>+ space-vector modulation"]
-    end
-    FREF["Flux reference<br/>0.175 Wb"] --> C1
-    FREF --> C2
-    TREF --> C1
-    TREF --> C2
-    C1 --> INV["2-level inverter<br/>Vdc = 300 V"]
-    C2 --> INV
-    INV --> MOT["PMSM<br/>Rs 2.875 ohm<br/>Ld = Lq 8.5 mH<br/>4 pole pairs"]
-    MOT --> SEN["Current and<br/>rotor-angle sensors"]
-    SEN --> EST["Stator-flux estimator<br/>voltage model"]
-    EST --> C1
-    EST --> C2
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Arial, Helvetica, sans-serif', 'fontSize': '18px'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 40, 'rankSpacing': 50, 'padding': 12}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1.5px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1.5px !important; } .nodeLabel { font-size: 18px !important; } .edgeLabel { font-size: 16px !important; }'}}%%
+flowchart TB
+    SR["Speed reference"] --> SPI["Speed PI"]
+    SPI --> DTC["DTC / SVM-DTC"]
+    DTC --> INV["2-level inverter"]
+    INV --> PMSM["PMSM"]
+    PMSM --> EST["Flux / torque estimator"]
+    EST --> DTC
+    EST --> SPI
 ```
 
 **Two paths from the same torque command:**

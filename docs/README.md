@@ -7,14 +7,13 @@ debugging context, or model details.
 ## How the documents fit together
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Helvetica, Arial, sans-serif'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 28, 'rankSpacing': 35}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1px !important; }'}}%%
-flowchart LR
-    RB["RUNBOOK<br/>how to run and build"] --> EX["experiments/<br/>models + scripts"]
-    EX --> RES["results/<br/>numbers and plots"]
-    RES --> REP["reports/<br/>written PDF"]
-
-    CL["CHANGELOG<br/>what changed"] -.-> FW["Future work"]
-    LL["lessons_learned<br/>what to avoid next time"] -.-> FW
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Arial, Helvetica, sans-serif', 'fontSize': '18px'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 40, 'rankSpacing': 50, 'padding': 12}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1.5px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1.5px !important; } .nodeLabel { font-size: 18px !important; } .edgeLabel { font-size: 16px !important; }'}}%%
+flowchart TB
+    RB["RUNBOOK"] --> EX["Experiments"]
+    EX --> RES["Results"]
+    RES --> REP["Report"]
+    CL["CHANGELOG"] -.-> FW["Future work"]
+    LL["Lessons learned"] -.-> FW
     FW -.-> EX
 ```
 

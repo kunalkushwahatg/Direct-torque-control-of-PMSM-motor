@@ -7,11 +7,11 @@ not a count of folders.
 ## The sequence
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Helvetica, Arial, sans-serif'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 28, 'rankSpacing': 35}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1px !important; }'}}%%
-flowchart LR
-    E1["exp01<br/>SVM-DTC vs classical DTC"] --> E2["exp02<br/>wrong Rs + low speed"]
-    E2 --> E3["exp03<br/>Rs stability boundary"]
-    E3 --> E5["exp05<br/>winder plant + tension<br/>final matrix"]
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Arial, Helvetica, sans-serif', 'fontSize': '18px'}, 'flowchart': {'curve': 'linear', 'nodeSpacing': 40, 'rankSpacing': 50, 'padding': 12}, 'themeCSS': '.node rect, .node circle, .node ellipse, .node polygon, .node path { filter: none !important; stroke-width: 1.5px !important; } .cluster rect { filter: none !important; } .edgePath path { filter: none !important; stroke-width: 1.5px !important; } .nodeLabel { font-size: 18px !important; } .edgeLabel { font-size: 16px !important; }'}}%%
+flowchart TB
+    E1["exp01<br/>SVM-DTC vs classical DTC"] --> E2["exp02<br/>Rs mismatch + low speed"]
+    E2 --> E3["exp03<br/>Rs boundary"]
+    E3 --> E5["exp05<br/>winder + tension"]
 ```
 
 In plain language:
