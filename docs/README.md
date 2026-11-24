@@ -7,6 +7,7 @@ debugging context, or model details.
 ## How the documents fit together
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Helvetica'}, 'flowchart': {'curve': 'linear'}} }%%
 flowchart LR
     RB["RUNBOOK<br/>how to run and build"] --> EX["experiments/<br/>models + scripts"]
     EX --> RES["results/<br/>numbers and plots"]

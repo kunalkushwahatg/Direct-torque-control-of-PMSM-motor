@@ -38,6 +38,7 @@
 ## Signal flow
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Helvetica'}, 'flowchart': {'curve': 'linear'}} }%%
 flowchart LR
     REF["Speed reference"] --> PI["Speed PI<br/>Kp = 2, Ki = 150"]
     PI --> TREF["Torque reference"]

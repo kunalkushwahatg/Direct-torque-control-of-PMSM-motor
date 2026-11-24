@@ -26,6 +26,7 @@ Two drive-level torque-control schemes are compared on **the same mechanical pla
 | **SVM-DTC** | Flux PI + torque PI + rotation + inverse Clarke | Fixed-frequency PWM (5 kHz) |
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Helvetica'}, 'flowchart': {'curve': 'linear'}} }%%
 flowchart TB
     L["Line-speed reference"] --> TPI["Tension PI"]
     FB["Tension feedback"] --> TPI
@@ -39,14 +40,6 @@ flowchart TB
     WIND --> FB
     WIND -. "radius, inertia" .-> FF
 
-    classDef ref fill:#e8f0fe,stroke:#5b7fae,color:#17263c;
-    classDef ctrl fill:#fff4e5,stroke:#c1873b,color:#3b2a12;
-    classDef drive fill:#f1e8fb,stroke:#8a6bb0,color:#2b1b3d;
-    classDef plant fill:#e8f6ee,stroke:#4c9169,color:#163322;
-    class L,FB ref;
-    class TPI,FF,WREF,SPD ctrl;
-    class DTC,INV,PMSM drive;
-    class WIND plant;
 ```
 
 The project covers:

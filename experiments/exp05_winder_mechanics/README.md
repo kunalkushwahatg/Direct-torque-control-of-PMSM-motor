@@ -60,6 +60,7 @@ Both use the same voltage-model stator-flux estimator (λ ≈ 0.175 Wb), the sam
 ## 3. How the pieces fit
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Helvetica'}, 'flowchart': {'curve': 'linear'}} }%%
 flowchart TB
     subgraph REF["Reference"]
         L["Line-speed reference<br/>S-curve to 1.2 m/s"]
@@ -99,14 +100,6 @@ flowchart TB
     FB -->|"F"| PI
     R -. "r, J, omega" .-> FF
 
-    classDef ref fill:#e8f0fe,stroke:#5b7fae,color:#17263c;
-    classDef ctrl fill:#fff4e5,stroke:#c1873b,color:#3b2a12;
-    classDef drive fill:#f1e8fb,stroke:#8a6bb0,color:#2b1b3d;
-    classDef plant fill:#e8f6ee,stroke:#4c9169,color:#163322;
-    class L,MODE ref;
-    class PI,FF,SUM,W,SP ctrl;
-    class D,M drive;
-    class R,FB plant;
 ```
 
 Read it as three layers:
@@ -155,6 +148,7 @@ These are the complete top-level models: drive, estimator, controller, winder pl
 ## 5. What happens in one simulation run
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Helvetica'}, 'flowchart': {'curve': 'linear'}} }%%
 flowchart TD
     A(["Start in MATLAB<br/>repository root"]) --> B["Load parameters<br/>pmsm_dtc_parameters.m<br/>winder_params.m"]
     B --> C["Choose the case<br/>model · mode · r0 · tag · FF"]

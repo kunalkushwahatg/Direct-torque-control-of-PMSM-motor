@@ -7,6 +7,7 @@ not a count of folders.
 ## The sequence
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Helvetica'}, 'flowchart': {'curve': 'linear'}} }%%
 flowchart LR
     E1["exp01<br/>SVM-DTC vs classical DTC"] --> E2["exp02<br/>wrong Rs + low speed"]
     E2 --> E3["exp03<br/>Rs stability boundary"]

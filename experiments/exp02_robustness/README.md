@@ -47,6 +47,7 @@ If `Rs_est` is wrong, the subtracted drop is wrong, and the flux estimate drifts
 ## How Rs error enters the drive
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Helvetica'}, 'flowchart': {'curve': 'linear'}} }%%
 flowchart LR
     subgraph LOOP["Closed-loop drive"]
         REF["Speed reference<br/>20 / 5 / 2 rad/s"] --> PI["Speed PI"]
@@ -83,6 +84,7 @@ Both models are the exp01 drives with two added hooks: an estimator Rs multiplie
 ## The boundary found here
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Helvetica'}, 'flowchart': {'curve': 'linear'}} }%%
 flowchart TB
     subgraph S20["20 rad/s"]
         direction LR
@@ -96,10 +98,6 @@ flowchart TB
         direction LR
         C1["Rs 70%<br/>lost"] --- C2["Rs 100%<br/>0.175 Wb"] --- C3["Rs 130%<br/>lost"]
     end
-    classDef ok fill:#d7f5dd,stroke:#2e7d32,color:#1b5e20;
-    classDef bad fill:#fde0e0,stroke:#c62828,color:#b71c1c;
-    class A1,A2,B2,C2 ok;
-    class A3,B1,B3,C1,C3 bad;
 ```
 
 **In words:** at 20 rad/s the drive tolerates a 30% underestimate but not a 30% overestimate. At 5 and 2 rad/s it tolerates only the correct value. This is a coarse boundary; exp03 resolves it in smaller steps.

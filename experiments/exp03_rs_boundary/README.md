@@ -19,6 +19,7 @@
 ## The answer in one picture
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Helvetica'}, 'flowchart': {'curve': 'linear'}} }%%
 flowchart TB
     subgraph S20["20 rad/s"]
         direction LR
@@ -28,10 +29,6 @@ flowchart TB
         direction LR
         C["Rs 100%<br/>flux 0.175 Wb"] --- D["every other value<br/>lost in 66-426 ms"]
     end
-    classDef ok fill:#d7f5dd,stroke:#2e7d32,color:#1b5e20;
-    classDef bad fill:#fde0e0,stroke:#c62828,color:#b71c1c;
-    class A,C ok;
-    class B,D bad;
 ```
 
 > **Boundary:** at 20 rad/s, +5% is already fatal. At 5 rad/s, even −10% is fatal.
@@ -52,6 +49,7 @@ flowchart TB
 ## How Rs error becomes instability
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#ffffff', 'tertiaryColor': '#ffffff', 'fontFamily': 'Helvetica'}, 'flowchart': {'curve': 'linear'}} }%%
 flowchart LR
     A["Rs_est too high"] --> B["Estimator subtracts<br/>too much resistive drop"]
     B --> C["Estimated flux drifts"]
@@ -59,8 +57,6 @@ flowchart LR
     D --> E["Voltage and current change"]
     E --> B
     C --> F["Speed control lost"]
-    classDef bad fill:#fde0e0,stroke:#c62828,color:#b71c1c;
-    class F bad;
 ```
 
 **The hypothesis from exp02:** the flux-error dynamics are approximately
