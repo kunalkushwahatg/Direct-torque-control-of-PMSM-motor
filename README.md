@@ -26,7 +26,7 @@ Two drive-level torque-control schemes are compared on **the same mechanical pla
 | **SVM-DTC** | Flux PI + torque PI + rotation + inverse Clarke | Fixed-frequency PWM (5 kHz) |
 
 <p align="center">
-  <img src="docs/diagrams/control_architecture.svg" width="72%" alt="Control architecture: tension loop, speed loop, PMSM drive and winder plant">
+  <img src="docs/diagrams/control_architecture.svg" width="88%" alt="Control architecture: tension loop, speed loop, PMSM drive and winder plant">
 </p>
 
 The project covers:

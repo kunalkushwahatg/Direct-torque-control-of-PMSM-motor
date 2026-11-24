@@ -60,7 +60,7 @@ Both use the same voltage-model stator-flux estimator (λ ≈ 0.175 Wb), the sam
 ## 3. How the pieces fit
 
 <p align="center">
-  <img src="../../docs/diagrams/control_architecture.svg" width="78%" alt="Winder control architecture: tension loop, speed loop, PMSM drive and winder plant">
+  <img src="../../docs/diagrams/control_architecture.svg" width="92%" alt="Winder control architecture: tension loop, speed loop, PMSM drive and winder plant">
 </p>
 
 Read it as three layers:
