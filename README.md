@@ -112,8 +112,7 @@ simulation/
 │   ├── midsem_2026-10/           mid-semester report
 │   └── final_2026-11/            final report
 ├── tools/                        shared MATLAB helpers
-├── templates/                    experiment README template
-└── archive/                      development history (old model versions)
+└── templates/                    experiment README template
 ```
 
 Each experiment follows the same structure:

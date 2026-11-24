@@ -1,5 +1,5 @@
-% HISTORICAL / DOCUMENTATION ONLY: shows how the *_final.slx models were derived from the development models
-% (now in archive/03_svm_dtc_development_2026-10 and archive/02_classic_baseline_validation_2026-10).
+% HISTORICAL / DOCUMENTATION ONLY: shows how the *_final.slx models were derived from the development models.
+% Those earlier models are not part of the public repository; they remain in Git history.
 % The paths below refer to the old flat layout and will not run as-is.
 % Builds svm_dtc_final.slx and classic_dtc_final.slx from the working models in the parent folder.
 here = pwd; par = fileparts(here);

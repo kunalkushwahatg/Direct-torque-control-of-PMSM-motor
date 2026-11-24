@@ -28,7 +28,7 @@ what to do next.
 | [RUNBOOK.md](RUNBOOK.md) | Step-by-step instructions: prerequisites, rebuilding the PDFs, running the simulations, and what each folder contains. |
 | [CHANGELOG.md](CHANGELOG.md) | Dated research log: what was built, what broke, and what was fixed. |
 | [lessons_learned.md](lessons_learned.md) | Numbered debugging lessons — the mistakes worth not repeating. |
-| [FILE_MAP.md](FILE_MAP.md) | Where older files were moved. Nothing was deleted, so this is the map from old paths to new ones. |
+| [FILE_MAP.md](FILE_MAP.md) | Short history note: the public repo keeps the final project, not the old development snapshots. |
 | [literature_rs_robust_flux_estimation.md](literature_rs_robust_flux_estimation.md) | First-pass literature map on flux estimation that tolerates a wrong stator resistance, including candidate gaps. |
 
 ## Model screenshots
