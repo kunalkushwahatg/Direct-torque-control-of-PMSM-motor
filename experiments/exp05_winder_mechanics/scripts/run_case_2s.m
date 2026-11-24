@@ -106,7 +106,8 @@ else
 end
 if mode > 0, dir_name = 'winding'; else, dir_name = 'unwinding'; end
 sgtitle(sprintf('%s: %s', ctrl_name, dir_name));
-save_figure(fig,['fig2s_' tag],figdir);
+figTag = lower(strrep(tag,'.',''));
+save_figure(fig,['fig_case_' figTag],figdir);
 close(fig);
 
 fprintf('\n=== %s ===\n', tag);

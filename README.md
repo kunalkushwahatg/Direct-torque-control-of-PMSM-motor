@@ -68,14 +68,14 @@ Representative final results from the 2 s, damped-web, S-curve matrix:
 ### Waveform preview
 
 <p align="center">
-  <img src="experiments/exp05_winder_mechanics/figures/fig2s_Classical_wind_ff1.png" width="48%" alt="Classical DTC winding waveforms">
-  <img src="experiments/exp05_winder_mechanics/figures/fig2s_SVM_wind_ff1.png" width="48%" alt="SVM-DTC winding waveforms">
+  <img src="experiments/exp05_winder_mechanics/figures/fig_case_classical_wind_ff1.png" width="48%" alt="Classical DTC winding waveforms">
+  <img src="experiments/exp05_winder_mechanics/figures/fig_case_svm_wind_ff1.png" width="48%" alt="SVM-DTC winding waveforms">
 </p>
 
 ### Overlay comparison
 
 <p align="center">
-  <img src="reports/final_2026-11/figures/fig_overlay3.png" width="100%" alt="Classical DTC vs SVM-DTC overlay: web tension, motor torque and surface-speed mismatch">
+  <img src="reports/final_2026-11/figures/fig_overlay_3panel.png" width="100%" alt="Classical DTC vs SVM-DTC overlay: web tension, motor torque and surface-speed mismatch">
 </p>
 
 *Classical DTC vs SVM-DTC on the same winding case with feedforward on: web tension, motor torque, and surface-speed mismatch.*
@@ -163,7 +163,7 @@ met = run_case_2s('classic_dtc_winder', +1, 0.06, 'my_test', 1, 1);
 Outputs:
 
 - `results/val2s_my_test.mat` — raw waveforms
-- `figures/fig2s_my_test.png/.pdf/.fig` — six-panel figure
+- `figures/fig_case_my_test.png/.pdf/.fig` — six-panel figure
 - Printed metrics in the MATLAB command window
 
 `run_case_2s` arguments:
@@ -193,7 +193,7 @@ Outputs:
 - `results/final_matrix.csv`
 - `results/final_matrix.mat`
 - `results/val2s_<tag>.mat`
-- `figures/fig2s_<tag>.png/.pdf/.fig`
+- `figures/fig_case_<tag>.png/.pdf/.fig`
 
 ### Reproduce exp01–exp03
 
@@ -227,7 +227,7 @@ Use the corresponding experiment folder for `exp02` and `exp03`. See each `READM
 | [`docs/CHANGELOG.md`](docs/CHANGELOG.md) | Research log and decisions |
 | [`docs/lessons_learned.md`](docs/lessons_learned.md) | Debugging knowledge |
 | [`docs/FILE_MAP.md`](docs/FILE_MAP.md) | Where old files were moved |
-| [`docs/BLOCK_AUDIT_classic_clean.md`](docs/BLOCK_AUDIT_classic_clean.md) | Block-by-block audit of the classical winder model |
+| [`docs/block_audit_classic_clean.md`](docs/block_audit_classic_clean.md) | Block-by-block audit of the classical winder model |
 
 ---
 

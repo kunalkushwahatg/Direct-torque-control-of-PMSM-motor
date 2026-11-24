@@ -15,4 +15,4 @@ Every reference has its DOI as a clickable link (blue text in the reference list
 
 ## Regenerating figures
 - `make_report_figures.m` rebuilds the six result figures from `../../experiments/`.
-- `shot_models.m` rebuilds the two Simulink screenshots from tidied temporary copies of the final models (the experiment models are not changed).
+- `capture_model_screenshots.m` rebuilds the two Simulink screenshots from tidied temporary copies of the final models (the experiment models are not changed).

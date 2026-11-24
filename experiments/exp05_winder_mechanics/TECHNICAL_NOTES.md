@@ -81,7 +81,7 @@ industry-standard.
 ## 4. Model structure
 
 ```
-winder_mechanics.slx
+models/winder_mechanics.slx
 ├── Line speed (ramp) -> v_sat -> v_line
 ├── Tension ref, Mode
 ├── Winder Plant            (S-function: r, H, F states)
@@ -162,7 +162,7 @@ Each contains: r(t), J(t), F(t), v_line vs v_surf, T_web(t), omega(t).
 
 ### Model screenshots
 
-- `figures/model_top.png`
+- `figures/model_top_level.png`
 - `figures/model_plant.png`
 
 ## 7. Integration with the existing PMSM drive
@@ -1010,7 +1010,7 @@ and lifts the worst dip by ~0.5 N.
 
 All cases use the S-curve, Kelvin–Voigt web, 2 s duration, `MaxStep = 5e-6`.
 Results are written to `results/final_matrix.csv` and `.mat`; figures to
-`figures/fig2s_*.png`.
+`figures/fig_case_*.png`.
 
 ## 19. Literature comparison and contribution
 

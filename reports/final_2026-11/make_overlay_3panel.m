@@ -30,6 +30,6 @@ xlabel('t [s]'); ylabel('v_{surf}-v_{line} [m/s]'); title('Surface-speed mismatc
 legend([h1 h2],{'SVM-DTC','Classical DTC'},'Location','southeast','FontSize',9);
 
 sgtitle('Classical DTC vs SVM-DTC: winding, feedforward on');
-print(fig,'-dpng','-r160',fullfile(outdir,'fig_overlay3.png'));
+print(fig,'-dpng','-r160',fullfile(outdir,'fig_overlay_3panel.png'));
 close(fig);
-fprintf('saved fig_overlay3.png\n');
+fprintf('saved fig_overlay_3panel.png\n');

@@ -35,12 +35,12 @@ checked without opening every block.
 
 | File | What it contains |
 |---|---|
-| [BLOCK_AUDIT_classic_clean.md](BLOCK_AUDIT_classic_clean.md) | Human-readable audit: block counts, key parameters, and warnings about which model file is actually used. |
-| [BLOCK_AUDIT_classic_clean_important_params.csv](BLOCK_AUDIT_classic_clean_important_params.csv) | Short curated list of the parameters that actually change behaviour. |
-| [BLOCK_AUDIT_classic_clean_key_values.csv](BLOCK_AUDIT_classic_clean_key_values.csv) | Key block values shown as both the expression and the resolved number. |
-| [BLOCK_AUDIT_classic_clean_all_params.csv](BLOCK_AUDIT_classic_clean_all_params.csv) | Every dialog parameter of the user-level blocks, including defaults. |
-| [BLOCK_AUDIT_classic_clean_all_blocks.csv](BLOCK_AUDIT_classic_clean_all_blocks.csv) | Every block path in the audited model, including standard library internals. |
-| [BLOCK_AUDIT_classic_clean_matlab_functions.txt](BLOCK_AUDIT_classic_clean_matlab_functions.txt) | Full source of the MATLAB Function blocks and the `dtc_estimator` chart. |
+| [block_audit_classic_clean.md](block_audit_classic_clean.md) | Human-readable audit: block counts, key parameters, and warnings about which model file is actually used. |
+| [block_audit_classic_clean_important_params.csv](block_audit_classic_clean_important_params.csv) | Short curated list of the parameters that actually change behaviour. |
+| [block_audit_classic_clean_key_values.csv](block_audit_classic_clean_key_values.csv) | Key block values shown as both the expression and the resolved number. |
+| [block_audit_classic_clean_all_params.csv](block_audit_classic_clean_all_params.csv) | Every dialog parameter of the user-level blocks, including defaults. |
+| [block_audit_classic_clean_all_blocks.csv](block_audit_classic_clean_all_blocks.csv) | Every block path in the audited model, including standard library internals. |
+| [block_audit_classic_clean_matlab_functions.txt](block_audit_classic_clean_matlab_functions.txt) | Full source of the MATLAB Function blocks and the `dtc_estimator` chart. |
 
 ## Suggested reading order
 

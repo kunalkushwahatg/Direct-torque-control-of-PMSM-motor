@@ -7,9 +7,14 @@ function build_winder_model()
 %   so the diagram stays readable and the equations live in one place.
 %   Logging is a single 10-channel Mux -> one To Workspace block.
 
+exp_root = fileparts(fileparts(mfilename('fullpath')));
+models_dir = fullfile(exp_root,'models');
+if ~exist(models_dir,'dir'), mkdir(models_dir); end
+model_file = fullfile(models_dir,'winder_mechanics.slx');
+
 mdl = 'winder_mechanics';
 if bdIsLoaded(mdl), close_system(mdl,0); end
-if exist([mdl '.slx'],'file'), delete([mdl '.slx']); end
+if exist(model_file,'file'), delete(model_file); end
 new_system(mdl); open_system(mdl);
 
 %% ---------------- sources ----------------
@@ -78,8 +83,8 @@ set_param(mdl,'StopTime','Tsim');
 set_param(mdl,'Solver','VariableStepAuto','RelTol','1e-4','MaxStep','1e-3');
 set_param(mdl,'SaveOutput','off','SignalLogging','off');
 
-save_system(mdl);
-fprintf('Built %s.slx\n', mdl);
+save_system(mdl, model_file);
+fprintf('Built %s\n', model_file);
 end
 
 %% =======================================================================

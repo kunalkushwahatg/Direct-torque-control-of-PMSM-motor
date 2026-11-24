@@ -55,12 +55,12 @@ The raw `.mat` results are not committed. If they exist locally:
 
 ```matlab
 cd('reports/final_2026-11')
-run('make_overlay3.m')      % report 3-panel overlay
+run('make_overlay_3panel.m')      % report 3-panel overlay
 ```
 
 The figures already included in `reports/final_2026-11/figures/` are part of the
 repository. To recreate them from scratch, first run the exp05 matrix, then run
-`make_overlay3.m`.
+`make_overlay_3panel.m`.
 
 ### 2.2 Build the report
 
@@ -110,10 +110,12 @@ Produces:
 | `results/final_matrix.csv` | One row per case: RMSE, min/max, speed RMSE, mismatch, Te peak/ripple, Ia peak/rms, saturation time, balance residual, radius/inertia endpoints, wall time |
 | `results/final_matrix.mat` | The same table as a MATLAB table |
 | `results/val2s_<tag>.mat` | Raw time series for every case (`t,F,omg,wr,vl,r,J,TL,Te,ia,met`) |
-| `figures/fig2s_<tag>.png/.pdf/.fig` | Six-panel figure for every case (tension, speed, radius, inertia, torque, mismatch) |
+| `figures/fig_case_<tag>.png/.pdf/.fig` | Six-panel figure for every case (tension, speed, radius, inertia, torque, mismatch) |
 
-Case tags look like `SVM_wind_ff1`, `Classical_wind_ff0`,
+Case tags in `final_matrix.csv` look like `SVM_wind_ff1`, `Classical_wind_ff0`,
 `SVM_wind_v0.8_ff1`, `Classical_unwind_r100_ff1`, `SVM_wind_Fstep_ff1`.
+Figure filenames are lowercased and dots are removed:
+`SVM_wind_v0.8_ff1` becomes `fig_case_svm_wind_v08_ff1`.
 
 **One case only** (about 2–4 min):
 
@@ -136,7 +138,7 @@ ffon   : 0 = feedforward off, 1 = on
 fffull : 1 = full feedforward, 0 = inertia only
 ```
 
-It writes `results/val2s_my_test.mat` and `figures/fig2s_my_test.*`.
+It writes `results/val2s_my_test.mat` and `figures/fig_case_my_test.*`.
 It forces `Tsim = 2 s`, `T_ramp = 1 s`, `H0 = 0`, `F0 = F_ref`,
 and `filt_on = 1`; change those lines in `run_case_2s.m` if you want other values.
 
@@ -153,7 +155,7 @@ build_winder_model
 run('scripts\validate_winder.m')
 ```
 
-This **deletes and rebuilds** `winder_mechanics.slx`. It writes
+This **deletes and rebuilds** `models/winder_mechanics.slx`. It writes
 `results/validation_metrics.csv`, `results/validation_winding.mat`,
 `results/validation_unwinding.mat`, and the winding/unwinding validation figures.
 Do not run `build_winder_model` if you have manual edits in that model.
@@ -276,9 +278,9 @@ The filename tells you the case.
 | Figure | Producer |
 |---|---|
 | `fig_classic_wind.png`, `fig_svm_wind.png` (report) | generated from the saved exp05 results |
-| `fig_overlay3.png` (report) | `reports/final_2026-11/make_overlay3.m` |
-| `fig2s_<tag>.png/.pdf/.fig` | `run_case_2s` (during a run) |
-| `fig_ff_summary.png`, `fig_svm_unwind.png`, `fig_classic_unwind.png` | copied from the corresponding exp05 six-panel/ff figures; the repo has no single regeneration script for these |
+| `fig_overlay_3panel.png` (report) | `reports/final_2026-11/make_overlay_3panel.m` |
+| `fig_case_<tag>.png/.pdf/.fig` | `run_case_2s` (during a run) |
+| `fig_summary_ff.png`, `fig_svm_unwind.png`, `fig_classic_unwind.png` | copied from the corresponding exp05 six-panel/ff figures; the repo has no single regeneration script for these |
 | `fig_plant_validation*.png` | `validate_winder.m` |
 
 After regenerating, rebuild the PDF(s). LaTeX reads the PNGs at compile time, so
@@ -308,7 +310,7 @@ Do **not** run these unless you intend to rewrite the `.slx` files:
 
 - `build_drive_native.m` (rebuilds the drive model and saves it),
 - `add_feedforward.m`, `add_startup_and_filter.m` (modify and save the model),
-- `build_winder_model.m` (deletes and rebuilds `winder_mechanics.slx`).
+- `build_winder_model.m` (deletes and rebuilds `models/winder_mechanics.slx`).
 
 Back up `models/` before any of them.
 

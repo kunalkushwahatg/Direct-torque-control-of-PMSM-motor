@@ -144,7 +144,7 @@ The full 18-case matrix, including speed/radius robustness and a tension step, i
 
 | SVM-DTC, winding, FF on | Classical DTC, winding, FF on |
 |---|---|
-| ![SVM-DTC winding response](figures/fig2s_SVM_wind_ff1.png) | ![Classical DTC winding response](figures/fig2s_Classical_wind_ff1.png) |
+| ![SVM-DTC winding response](figures/fig_case_svm_wind_ff1.png) | ![Classical DTC winding response](figures/fig_case_classical_wind_ff1.png) |
 
 Both panels show tension, shaft speed, roll radius, inertia, motor torque, and surface-speed mismatch. The classical drive holds a tighter tension band but shows visibly larger torque ripple; the SVM drive is calmer electrically, with short tension dips during the ramp.
 
@@ -176,12 +176,15 @@ The function sets `Tsim = 2 s`, `T_ramp = 1 s`, enables the 2 Hz tension filter,
 | Output | Path | Contents |
 |---|---|---|
 | Data | `results/val2s_<tag>.mat` | `t`, `F`, `omg`, `wr`, `vl`, `r`, `J`, `TL`, `Te`, `ia`, `met` |
-| Figure | `figures/fig2s_<tag>.png` | Six-panel summary at 300 dpi |
-| Vector figure | `figures/fig2s_<tag>.pdf` | Same figure for reports |
-| Editable figure | `figures/fig2s_<tag>.fig` | MATLAB figure file |
+| Figure | `figures/fig_case_<tag>.png` | Six-panel summary at 300 dpi |
+| Vector figure | `figures/fig_case_<tag>.pdf` | Same figure for reports |
+| Editable figure | `figures/fig_case_<tag>.fig` | MATLAB figure file |
 | Console | Command Window | Printed metric summary |
 
 The printed summary contains tension RMSE, min/max/mean tension, speed RMSE, torque ripple, peak and RMS current, saturation time, torque-balance residual, and wall-clock time.
+
+Figure filenames are lowercased and dots are removed from the tag:
+`SVM_wind_v0.8_ff1` becomes `fig_case_svm_wind_v08_ff1`.
 
 ## Good to know
 

@@ -24,7 +24,7 @@ items = {
     'exp03_svm_dtc_rs',        fullfile(repo_root, 'experiments', 'exp03_rs_boundary', 'models', 'svm_dtc_rs.slx');
     'exp05_classic_winder',    fullfile(repo_root, 'experiments', 'exp05_winder_mechanics', 'models', 'classic_dtc_winder.slx');
     'exp05_svm_winder',        fullfile(repo_root, 'experiments', 'exp05_winder_mechanics', 'models', 'svm_dtc_winder.slx');
-    'exp05_winder_plant',      fullfile(repo_root, 'experiments', 'exp05_winder_mechanics', 'winder_mechanics.slx')
+    'exp05_winder_plant',      fullfile(repo_root, 'experiments', 'exp05_winder_mechanics', 'models', 'winder_mechanics.slx')
 };
 
 for k = 1:size(items, 1)

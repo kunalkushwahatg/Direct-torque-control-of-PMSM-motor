@@ -1,7 +1,7 @@
 % Screenshots of the two Simulink models for the report (tidied temporary copies; the experiment models are not modified)
 here = fileparts(mfilename('fullpath')); root = fileparts(fileparts(here));
 mdir = fullfile(root,'experiments','exp01_svm_vs_classic_dtc','models'); fdir = fullfile(here,'figures');
-tmp = fullfile(tempdir,'shot_models'); if ~exist(tmp,'dir'), mkdir(tmp); end; addpath(tmp);
+tmp = fullfile(tempdir,'capture_model_screenshots'); if ~exist(tmp,'dir'), mkdir(tmp); end; addpath(tmp);
 run(fullfile(root,'experiments','exp01_svm_vs_classic_dtc','scripts','pmsm_dtc_parameters.m'));
 src = {'svm_dtc_final','classic_dtc_final'}; dst = {'shot_svm','shot_classic'}; out = {'simulink_dtc_svm.png','simulink_dtc_classic.png'};
 for k = 1:2

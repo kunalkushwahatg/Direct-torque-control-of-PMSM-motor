@@ -4,7 +4,7 @@
 % writes results/validation_metrics.csv and six plots per case.
 
 exp_root = fileparts(fileparts(mfilename('fullpath')));
-addpath(exp_root, fullfile(exp_root,'scripts'), ...
+addpath(exp_root, fullfile(exp_root,'scripts'), fullfile(exp_root,'models'), ...
         fullfile(exp_root,'..','..','tools'));
 run(fullfile(exp_root,'scripts','winder_params.m'));
 
