@@ -186,7 +186,7 @@ The measured rates are about 0.3–2.7× the prediction and are not monotonic. A
 - **Coarse near the boundary:** 5% steps. At 20 rad/s the boundary lies between 100 and 105%; at 5 rad/s the safe interval around 100% is unresolved and could be only a few percent.
 - **Threshold, not proof:** "lost control" is a flag (true flux < 50% of 0.175 Wb, or mean speed error > 20% of target); failure time is a 0.03 Wb crossing, not the exact onset of instability.
 - **Crude growth fits:** the fit window includes the speed ramp and load step, so the measured growth rates are indicative.
-- **Mixed sources:** the 70/100/130% rows are reused from exp02, not rerun here (same models and conditions).
+- **Mixed sources and windows:** the 70/100/130% rows are reused from exp02. exp02 used a 0.5–0.8 s window; the new exp03 rows use 0.5–0.9 s. The individual values are valid, but the table is not strictly identical in window length.
 - **Model limitations:** pure voltage-model integrator, ideal inverter with no dead time, inverted current sensors, SPMSM assumption, simulation only.
 
 ## References
