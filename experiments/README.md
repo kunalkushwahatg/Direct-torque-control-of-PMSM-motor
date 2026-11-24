@@ -39,4 +39,5 @@ In plain language:
 > folder count.
 
 For the commands that run these experiments and rebuild their figures, see the
-[runbook](../docs/RUNBOOK.md).
+[runbook](../docs/RUNBOOK.md). For full top-level model views, see
+[model screenshots](../docs/screenshots/README.md).

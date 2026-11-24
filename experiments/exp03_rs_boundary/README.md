@@ -79,6 +79,15 @@ Here `L` is the stator inductance (8.5 mH). A positive mismatch (`Rs_est > Rs`) 
 | **Rs correct (100%)** | ✅ 0.175 Wb | ✅ 0.175 Wb | nominal |
 | **Rs too high (105–130%)** | ❌ lost | ❌ lost | runaway |
 
+## Whole-model screenshots
+
+<p align="center">
+  <img src="../../docs/screenshots/exp03_classic_dtc_rs.png" width="49%" alt="Classical DTC Rs boundary model">
+  <img src="../../docs/screenshots/exp03_svm_dtc_rs.png" width="49%" alt="SVM-DTC Rs boundary model">
+</p>
+
+These are the complete top-level models used for the fine Rs sweep.
+
 ## Test matrix
 
 | Group | Rs values | Speeds | Controllers | Result rows |

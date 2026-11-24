@@ -71,6 +71,15 @@ flowchart LR
 | **100%** | Correct drop | True flux 0.175 Wb. |
 | **130%** | Too much resistive drop | The estimate runs away; true flux rises to 0.47–0.53 Wb and speed control is lost. |
 
+## Whole-model screenshots
+
+<p align="center">
+  <img src="../../docs/screenshots/exp02_classic_dtc_rob.png" width="49%" alt="Classical DTC robustness model">
+  <img src="../../docs/screenshots/exp02_svm_dtc_rob.png" width="49%" alt="SVM-DTC robustness model">
+</p>
+
+Both models are the exp01 drives with two added hooks: an estimator Rs multiplier and a speed-reversal reference.
+
 ## The boundary found here
 
 ```mermaid

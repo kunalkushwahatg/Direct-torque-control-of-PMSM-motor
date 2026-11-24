@@ -39,3 +39,15 @@ new_experiment('web_tension_observer')
 
 `projectRoot` is an optional second argument; leave it out when running from the
 repository root.
+
+## `export_model_screenshots.m`
+
+Saves full top-level screenshots of every experiment model into
+`docs/screenshots/`.
+
+```matlab
+addpath('tools')
+export_model_screenshots
+```
+
+The script only loads, prints, and closes the models; it does not save or modify them.

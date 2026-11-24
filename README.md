@@ -83,6 +83,15 @@ Representative final results from the 2 s, damped-web, S-curve matrix:
   <img src="experiments/exp05_winder_mechanics/figures/fig2s_SVM_wind_ff1.png" width="48%" alt="SVM-DTC winding waveforms">
 </p>
 
+### Whole-model screenshots
+
+<p align="center">
+  <img src="docs/screenshots/exp05_classic_winder.png" width="48%" alt="Classical DTC winder model">
+  <img src="docs/screenshots/exp05_svm_winder.png" width="48%" alt="SVM-DTC winder model">
+</p>
+
+See all experiment models in [`docs/screenshots/`](docs/screenshots/README.md).
+
 ---
 
 ## Repository layout
@@ -93,7 +102,7 @@ simulation/
 ├── LICENSE
 ├── CITATION.cff
 ├── .gitignore
-├── docs/                         ← runbook, changelog, lessons, block audits
+├── docs/                         ← runbook, changelog, lessons, block audits, model screenshots
 ├── experiments/
 │   ├── exp01_svm_vs_classic_dtc/ classical vs SVM-DTC: dynamic test + sweep
 │   ├── exp02_robustness/         Rs mismatch, low speed, speed reversal

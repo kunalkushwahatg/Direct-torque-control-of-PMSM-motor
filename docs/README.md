@@ -31,6 +31,10 @@ what to do next.
 | [FILE_MAP.md](FILE_MAP.md) | Where older files were moved. Nothing was deleted, so this is the map from old paths to new ones. |
 | [literature_rs_robust_flux_estimation.md](literature_rs_robust_flux_estimation.md) | First-pass literature map on flux estimation that tolerates a wrong stator resistance, including candidate gaps. |
 
+## Model screenshots
+
+- [Model screenshots](screenshots/README.md) — full top-level views of every Simulink model in exp01–exp05.
+
 ## Model audit
 
 The audit records what is inside the main clean winder model, so a parameter can be

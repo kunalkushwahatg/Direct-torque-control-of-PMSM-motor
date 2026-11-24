@@ -67,6 +67,15 @@ flowchart LR
 
 Both controllers use the same 20 µs control period and the same speed PI.
 
+## Whole-model screenshots
+
+<p align="center">
+  <img src="../../docs/screenshots/exp01_classic_dtc_final.png" width="49%" alt="Classical DTC whole model">
+  <img src="../../docs/screenshots/exp01_svm_dtc_final.png" width="49%" alt="SVM-DTC whole model">
+</p>
+
+These are the full top-level models: PMSM, inverter, sensors, estimator, controller, speed loop, load, and logging.
+
 ## Test plan
 
 | Test | Speed | Load | Analysis windows | What it checks |

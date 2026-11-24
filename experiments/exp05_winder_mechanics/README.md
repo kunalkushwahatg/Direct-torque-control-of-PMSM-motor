@@ -128,6 +128,19 @@ T_ff = J·dω_ref/dt + (dJ/dt)·ω_ref + mode·F_ref·r + B·ω_ref
 
 *The plant block: inputs `Te`, `v_line`, `mode`; outputs `F`, `r`, `J`, `TL`, `omega`, `v_surf`, `m`.*
 
+### Whole-model screenshots
+
+<p align="center">
+  <img src="../../docs/screenshots/exp05_classic_winder.png" width="49%" alt="Classical DTC winder whole model">
+  <img src="../../docs/screenshots/exp05_svm_winder.png" width="49%" alt="SVM-DTC winder whole model">
+</p>
+
+<p align="center">
+  <img src="../../docs/screenshots/exp05_winder_plant.png" width="70%" alt="Winder plant model">
+</p>
+
+These are the complete top-level models: drive, estimator, controller, winder plant, tension loop, feedforward, and logging.
+
 ## 5. What happens in one simulation run
 
 ```mermaid
